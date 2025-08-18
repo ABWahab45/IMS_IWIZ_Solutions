@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import ThemeToggle from '../Common/ThemeToggle';
 import { getAvatarUrl } from '../../utils/imageUtils';
-import DynamicLogo from '../Common/DynamicLogo';
+import IwizLogo from '../Common/IwizLogo';
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -60,15 +60,15 @@ const Navbar = () => {
         >
           <i className="fas fa-bars fs-5"></i>
         </button>
-        <div className="d-flex align-items-center">
-          <DynamicLogo size="medium" className="me-2" />
-          <h5 className="mb-0 fw-semibold navbar-title">
-            Inventory Management System
-          </h5>
-        </div>
+        <h5 className="mb-0 fw-semibold navbar-title">
+          Inventory Management System
+        </h5>
       </div>
 
       <div className="d-flex align-items-center gap-3">
+        <div className="me-3 d-none d-lg-block">
+          <IwizLogo size="small" showText={false} />
+        </div>
         <ThemeToggle className="me-3" />
 
         <div className="position-relative" ref={userMenuRef}>

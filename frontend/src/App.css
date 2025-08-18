@@ -1712,30 +1712,82 @@ code {
   background: #64748b;
 }
 
-/* Dynamic Logo Styles */
-.dynamic-logo {
-  transition: all var(--transition-normal);
-}
-
-.dynamic-logo:hover {
-  transform: scale(1.05);
-}
-
-.dynamic-logo .stylized-w {
-  position: relative;
+/* IWIZ Logo Styles */
+.iwiz-logo {
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
   display: inline-block;
 }
 
-.dynamic-logo .stylized-w::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -3px;
-  width: 8px;
+.iwiz-logo .logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.iwiz-logo .logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.iwiz-logo .iwiz-text {
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 2;
+}
+
+.iwiz-logo .solutions-text {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.4em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: -0.1em;
+}
+
+.iwiz-logo .logo-graphic {
+  position: relative;
+  z-index: 1;
+}
+
+.iwiz-logo .lightning-bolt {
+  color: var(--primary-color);
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.3));
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.3));
+  }
+  to {
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+  }
+}
+
+/* Logo size variations */
+.iwiz-logo.text-2xl .lightning-bolt {
+  width: 16px;
   height: 16px;
-  background: currentColor;
-  transform: rotate(45deg);
-  border-radius: 1px;
+}
+
+.iwiz-logo.text-3xl .lightning-bolt {
+  width: 20px;
+  height: 20px;
+}
+
+.iwiz-logo.text-4xl .lightning-bolt {
+  width: 24px;
+  height: 24px;
+}
+
+.iwiz-logo.text-5xl .lightning-bolt {
+  width: 28px;
+  height: 28px;
 }
 
 /* Auth styles */

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import DynamicLogo from '../../components/Common/DynamicLogo';
+import IwizLogo from '../../components/Common/IwizLogo';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -57,7 +57,7 @@ const Login = () => {
               <div className="card-body p-5">
                 <div className="text-center mb-4">
                   <div className="mb-3">
-                    <DynamicLogo size="xlarge" />
+                    <IwizLogo size="large" className="text-center" />
                   </div>
                   <p className="text-muted">Inventory Management System</p>
                 </div>

@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import { getAvatarUrl } from '../../utils/imageUtils';
-import DynamicLogo from '../Common/DynamicLogo';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -79,7 +78,8 @@ const Sidebar = () => {
         <div className="d-flex align-items-center justify-content-between">
           {!collapsed && (
             <div>
-              <DynamicLogo size="large" className="text-white" />
+              <h4 className="mb-0">IWIZ</h4>
+              <small className="text-white opacity-75">Solutions</small>
             </div>
           )}
           <button
