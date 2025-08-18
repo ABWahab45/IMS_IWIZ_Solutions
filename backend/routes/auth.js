@@ -236,6 +236,53 @@ router.get('/list-users', async (req, res) => {
   }
 });
 
+// @route   POST /api/auth/reset-all-passwords
+// @desc    Reset all user passwords to a default (temporary)
+// @access  Public
+router.post('/reset-all-passwords', async (req, res) => {
+  try {
+    const { defaultPassword } = req.body;
+    
+    console.log('=== BULK PASSWORD RESET ===');
+    console.log('Default password:', defaultPassword);
+    
+    const users = await User.find({});
+    const results = [];
+    
+    for (const user of users) {
+      try {
+        user.password = defaultPassword;
+        await user.save();
+        results.push({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          status: 'success'
+        });
+        console.log(`Password reset for: ${user.email}`);
+      } catch (error) {
+        results.push({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          status: 'error',
+          error: error.message
+        });
+        console.error(`Error resetting password for ${user.email}:`, error);
+      }
+    }
+    
+    res.json({
+      message: 'Bulk password reset completed',
+      totalUsers: users.length,
+      results: results
+    });
+  } catch (error) {
+    console.error('Bulk reset error:', error);
+    res.status(500).json({ message: 'Bulk reset error' });
+  }
+});
+
 // @route   POST /api/auth/debug-password
 // @desc    Debug password comparison (temporary)
 // @access  Public
