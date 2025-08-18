@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1e293b"/>
+  
+  <!-- IWIZ text with proper positioning -->
+  <text x="8" y="14" fill="#94a3b8" font-family="Arial, sans-serif" font-size="7" font-weight="bold">I</text>
+  <text x="12" y="14" fill="#3b82f6" font-family="Arial, sans-serif" font-size="7" font-weight="bold">W</text>
+  <text x="16" y="14" fill="#94a3b8" font-family="Arial, sans-serif" font-size="7" font-weight="bold">I</text>
+  <text x="20" y="14" fill="#94a3b8" font-family="Arial, sans-serif" font-size="7" font-weight="bold">Z</text>
+  
+  <!-- Stylized W accent line -->
+  <path d="M13 8 L14 10 L15 8 L16 10 L17 8" stroke="#3b82f6" stroke-width="1.5" fill="none"/>
+  
+  <!-- SOLUTIONS text -->
+  <text x="16" y="24" text-anchor="middle" fill="#3b82f6" font-family="Arial, sans-serif" font-size="4" font-weight="bold">SOLUTIONS</text>
+</svg>

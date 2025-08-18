@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import DynamicLogo from '../../components/Common/DynamicLogo';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -63,6 +64,9 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
+          <div className="mb-3">
+            <DynamicLogo size="xlarge" />
+          </div>
           <h2>Create Account</h2>
           <p>Join IWIZ Inventory Management System</p>
         </div>

@@ -291,30 +291,33 @@ const InventoryList = () => {
                           </span>
                         </td>
                         <td>
-                          <div className="btn-group btn-group-sm">
+                          <div className="btn-group btn-group-sm d-flex flex-column flex-sm-row">
                             <Link
                               to={`/inventory/${product._id}`}
-                              className="btn btn-outline-primary"
+                              className="btn btn-outline-primary btn-sm"
                               title="View Details"
                             >
                               <i className="fas fa-eye"></i>
+                              <span className="d-none d-sm-inline ms-1">View</span>
                             </Link>
                             {hasPermission('canEditProducts') && (
                               <Link
                                 to={`/inventory/${product._id}/edit`}
-                                className="btn btn-outline-secondary"
+                                className="btn btn-outline-secondary btn-sm"
                                 title="Edit Product"
                               >
                                 <i className="fas fa-edit"></i>
+                                <span className="d-none d-sm-inline ms-1">Edit</span>
                               </Link>
                             )}
                             {hasPermission('canDeleteProducts') && (
                               <button
-                                className="btn btn-outline-danger"
+                                className="btn btn-outline-danger btn-sm"
                                 onClick={() => handleDelete(product._id)}
                                 title="Delete Product"
                               >
                                 <i className="fas fa-trash"></i>
+                                <span className="d-none d-sm-inline ms-1">Delete</span>
                               </button>
                             )}
                           </div>

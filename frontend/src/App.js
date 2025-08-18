@@ -15,6 +15,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import ErrorBoundary from './components/ErrorBoundary';
+import DynamicTitle from './components/Common/DynamicTitle';
 
 // Pages
 import Login from './pages/Auth/Login';
@@ -47,6 +48,7 @@ function App() {
         <AuthProvider>
           <SidebarProvider>
             <Router>
+              <DynamicTitle />
               <div className="App">
                 <Routes>
                   <Route path="/login" element={<Login />} />

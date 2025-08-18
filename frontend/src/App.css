@@ -1448,6 +1448,82 @@ code {
   .p-4 {
     padding: 1rem !important;
   }
+  
+  /* Mobile-specific improvements */
+  .btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .table-responsive {
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  /* Better mobile navigation */
+  .navbar-brand {
+    font-size: 1rem;
+  }
+  
+  .navbar .search-container {
+    max-width: 200px;
+    margin: 0 1rem;
+  }
+  
+  /* Mobile-friendly action buttons */
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .btn-group .btn {
+    border-radius: var(--radius) !important;
+    margin: 0;
+  }
+  
+  /* Mobile-friendly product cards */
+  .product-card {
+    margin-bottom: 1rem;
+  }
+  
+  .product-card .card-body {
+    padding: 1rem;
+  }
+  
+  /* Mobile-friendly forms */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Mobile-friendly modals */
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Mobile-friendly dropdowns */
+  .dropdown-menu {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 300px !important;
+    margin: 0 !important;
+  }
 }
 
 /* Extra Small Mobile (below 320px) */
@@ -1634,6 +1710,32 @@ code {
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+/* Dynamic Logo Styles */
+.dynamic-logo {
+  transition: all var(--transition-normal);
+}
+
+.dynamic-logo:hover {
+  transform: scale(1.05);
+}
+
+.dynamic-logo .stylized-w {
+  position: relative;
+  display: inline-block;
+}
+
+.dynamic-logo .stylized-w::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 8px;
+  height: 16px;
+  background: currentColor;
+  transform: rotate(45deg);
+  border-radius: 1px;
 }
 
 /* Auth styles */

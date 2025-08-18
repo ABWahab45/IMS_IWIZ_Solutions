@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import { getAvatarUrl } from '../../utils/imageUtils';
+import DynamicLogo from '../Common/DynamicLogo';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -42,7 +43,7 @@ const Sidebar = () => {
       path: '/inventory/request-handover',
       icon: 'fas fa-hand-holding-heart',
       label: 'Request Handover',
-      show: hasPermission('canRequestHandover')
+      show: hasPermission('canRequestHandover') && !isAdmin()
     },
     {
       path: '/inventory/return-handover',
@@ -78,8 +79,7 @@ const Sidebar = () => {
         <div className="d-flex align-items-center justify-content-between">
           {!collapsed && (
             <div>
-              <h4 className="mb-0">IWIZ</h4>
-              <small className="text-white opacity-75">Solutions</small>
+              <DynamicLogo size="large" className="text-white" />
             </div>
           )}
           <button

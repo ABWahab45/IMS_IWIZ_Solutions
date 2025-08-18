@@ -20,7 +20,9 @@ class ProductController {
       }
       
       const products = await Product.find(query)
-        .select('productId name description price stock status images tags createdAt')
+        .select('productId name description price stock status images tags createdAt createdBy updatedBy updatedAt')
+        .populate('createdBy', 'firstName lastName')
+        .populate('updatedBy', 'firstName lastName')
         .lean()
         .limit(parseInt(limit))
         .skip((parseInt(page) - 1) * parseInt(limit))
@@ -154,7 +156,8 @@ class ProductController {
           location: location || ''
         },
         tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-        status: status || 'active'
+        status: status || 'active',
+        updatedBy: req.user.id
       };
 
       if (images.length > 0) {
@@ -202,6 +205,8 @@ class ProductController {
   async getProductById(req, res) {
     try {
       const product = await Product.findById(req.params.id)
+        .populate('createdBy', 'firstName lastName')
+        .populate('updatedBy', 'firstName lastName')
         .select('-__v')
         .lean();
       

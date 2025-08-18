@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import DynamicLogo from '../../components/Common/DynamicLogo';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -56,9 +57,8 @@ const Login = () => {
               <div className="card-body p-5">
                 <div className="text-center mb-4">
                   <div className="mb-3">
-                    <i className="fas fa-boxes text-primary" style={{ fontSize: '3rem' }}></i>
+                    <DynamicLogo size="xlarge" />
                   </div>
-                  <h2 className="fw-bold text-dark mb-2">IWIZ Solutions</h2>
                   <p className="text-muted">Inventory Management System</p>
                 </div>
 

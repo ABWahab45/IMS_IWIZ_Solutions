@@ -114,7 +114,7 @@ userSchema.pre('save', function(next) {
           canViewProducts: true,
           canAddProducts: true,
           canEditProducts: true,
-          canDeleteProducts: false,
+          canDeleteProducts: true, // Manager can delete products
           canManageProducts: true, // Manager can do handovers
           canViewOrders: true,
           canManageOrders: true,
