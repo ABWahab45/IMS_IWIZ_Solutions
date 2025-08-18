@@ -95,26 +95,37 @@ export const AuthProvider = ({ children }) => {
 
   const setAuthToken = (token) => {
     if (token) {
+      // Set token for both global axios and our api instance
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
+      // Remove token from both
       delete axios.defaults.headers.common['Authorization'];
+      delete api.defaults.headers.common['Authorization'];
     }
   };
 
   const loadUser = async () => {
+    console.log('Loading user, token exists:', !!state.token);
     if (state.token) {
       setAuthToken(state.token);
       try {
         const response = await api.get('/auth/me');
+        console.log('User loaded successfully:', response.data.user.firstName);
         dispatch({
           type: AUTH_ACTIONS.LOAD_USER,
           payload: response.data.user
         });
       } catch (error) {
-        console.error('Load user error:', error);
+        console.error('Load user error:', {
+          status: error.response?.status,
+          message: error.response?.data?.message,
+          error: error.message
+        });
         dispatch({ type: AUTH_ACTIONS.LOGOUT });
       }
     } else {
+      console.log('No token found, logging out');
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
     }
   };
@@ -123,12 +134,14 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
     
     try {
+      console.log('Attempting login for:', email);
       const response = await api.post('/auth/login', {
         email,
         password
       });
       
       const { token, user } = response.data;
+      console.log('Login successful, token received:', token ? 'Yes' : 'No');
       
       setAuthToken(token);
       dispatch({
@@ -139,6 +152,11 @@ export const AuthProvider = ({ children }) => {
       toast.success(`Welcome back, ${user.firstName}!`);
       return { success: true };
     } catch (error) {
+      console.error('Login error details:', {
+        status: error.response?.status,
+        message: error.response?.data?.message,
+        error: error.message
+      });
       const errorMessage = error.response?.data?.message || 'Login failed';
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
