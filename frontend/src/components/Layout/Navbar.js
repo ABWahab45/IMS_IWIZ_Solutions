@@ -4,7 +4,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import ThemeToggle from '../Common/ThemeToggle';
 import { getAvatarUrl } from '../../utils/imageUtils';
-import IwizLogo from '../Common/IwizLogo';
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -66,9 +65,6 @@ const Navbar = () => {
       </div>
 
       <div className="d-flex align-items-center gap-3">
-        <div className="me-3 d-none d-lg-block">
-          <IwizLogo size="small" showText={false} />
-        </div>
         <ThemeToggle className="me-3" />
 
         <div className="position-relative" ref={userMenuRef}>
