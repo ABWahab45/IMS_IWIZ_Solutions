@@ -63,6 +63,17 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
+          <div className="text-center mb-3">
+            <img 
+              src="/iwizlogo.png" 
+              alt="IWIZ Solutions" 
+              style={{ 
+                height: '60px', 
+                width: 'auto',
+                marginBottom: '1rem'
+              }} 
+            />
+          </div>
           <h2>Create Account</h2>
           <p>Join IWIZ Inventory Management System</p>
         </div>

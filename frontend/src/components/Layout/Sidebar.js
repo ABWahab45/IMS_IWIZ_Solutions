@@ -76,12 +76,19 @@ const Sidebar = () => {
       <div className="sidebar-overlay d-md-none" onClick={toggleSidebar}></div>
       <div className="sidebar-brand">
         <div className="d-flex align-items-center justify-content-between">
-          {!collapsed && (
-            <div>
-              <h4 className="mb-0">IWIZ</h4>
-              <small className="text-white opacity-75">Solutions</small>
-            </div>
-          )}
+                      {!collapsed && (
+              <div>
+                <img 
+                  src="/iwizlogo.png" 
+                  alt="IWIZ Solutions" 
+                  style={{ 
+                    height: '40px', 
+                    width: 'auto',
+                    filter: 'brightness(0) invert(1)' // Makes the logo white for sidebar
+                  }} 
+                />
+              </div>
+            )}
           <button
             className="btn btn-link text-white p-0"
             onClick={toggleSidebar}

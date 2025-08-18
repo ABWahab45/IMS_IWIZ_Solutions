@@ -56,9 +56,16 @@ const Login = () => {
               <div className="card-body p-5">
                 <div className="text-center mb-4">
                   <div className="mb-3">
-                    <i className="fas fa-boxes text-primary" style={{ fontSize: '3rem' }}></i>
+                    <img 
+                      src="/iwizlogo.png" 
+                      alt="IWIZ Solutions" 
+                      style={{ 
+                        height: '60px', 
+                        width: 'auto',
+                        marginBottom: '1rem'
+                      }} 
+                    />
                   </div>
-                  <h2 className="fw-bold text-dark mb-2">IWIZ Solutions</h2>
                   <p className="text-muted">Inventory Management System</p>
                 </div>
 
