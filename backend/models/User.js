@@ -74,10 +74,19 @@ userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
+    console.log('=== PASSWORD HASHING ===');
+    console.log('Original password length:', this.password.length);
+    console.log('Password being hashed:', this.password);
+    
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
+    
+    console.log('Password hashed successfully');
+    console.log('Hashed password:', this.password.substring(0, 30) + '...');
+    
     next();
   } catch (error) {
+    console.error('Password hashing error:', error);
     next(error);
   }
 });
@@ -135,7 +144,15 @@ userSchema.pre('save', function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  console.log('=== PASSWORD COMPARISON ===');
+  console.log('Candidate password:', candidatePassword);
+  console.log('Candidate password length:', candidatePassword.length);
+  console.log('Stored hash:', this.password.substring(0, 30) + '...');
+  
+  const result = await bcrypt.compare(candidatePassword, this.password);
+  console.log('Comparison result:', result);
+  
+  return result;
 };
 
 // Get full name

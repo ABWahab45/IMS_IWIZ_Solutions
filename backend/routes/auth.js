@@ -187,6 +187,39 @@ router.post('/login', authLimiter, [
   }
 });
 
+// @route   POST /api/auth/reset-password
+// @desc    Reset password for debugging (temporary)
+// @access  Public
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    
+    console.log('=== PASSWORD RESET ===');
+    console.log('Email:', email);
+    console.log('New password length:', newPassword.length);
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Update password
+    user.password = newPassword;
+    await user.save();
+    
+    console.log('Password updated successfully');
+    
+    res.json({
+      message: 'Password updated successfully',
+      userId: user._id,
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(500).json({ message: 'Reset error' });
+  }
+});
+
 // @route   POST /api/auth/debug-password
 // @desc    Debug password comparison (temporary)
 // @access  Public
