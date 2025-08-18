@@ -1,21 +1,32 @@
 // Determine API URL based on environment
 const getApiBaseUrl = () => {
+  // Log current environment for debugging
+  console.log('Current hostname:', window.location.hostname);
+  console.log('REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+  
   if (process.env.REACT_APP_API_URL) {
+    console.log('Using REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
     return process.env.REACT_APP_API_URL;
   }
   
   // Check if we're in production (deployed on Vercel)
   if (window.location.hostname !== 'localhost') {
-    // Replace with your actual Render backend URL
-    return 'https://your-backend-app.onrender.com/api';
+    const productionUrl = 'https://ims-iwiz-solutions.onrender.com/api';
+    console.log('Using production URL:', productionUrl);
+    return productionUrl;
   }
   
-  return 'http://localhost:5000/api';
+  const localUrl = 'http://localhost:5000/api';
+  console.log('Using local URL:', localUrl);
+  return localUrl;
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
+  constructor() {
+    this.API_BASE_URL = API_BASE_URL;
+  }
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
@@ -76,6 +87,19 @@ class ApiService {
     return this.request(endpoint, {
       method: 'DELETE',
     });
+  }
+
+  // Test connection method
+  async testConnection() {
+    try {
+      console.log('Testing API connection...');
+      const response = await this.get('/health');
+      console.log('✅ API connection successful:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ API connection failed:', error);
+      throw error;
+    }
   }
 }
 

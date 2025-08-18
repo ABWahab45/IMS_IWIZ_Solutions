@@ -29,7 +29,11 @@ const createUploadDirectories = () => {
 // CORS configuration for production
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app', 'http://localhost:3000'] // Replace with your actual Vercel domain
+    ? [
+        'https://ims-iwiz-solutions.vercel.app',
+        'https://ims-iwiz-solutions-hyfzyrgj5-abwahabs-projects.vercel.app',
+        'http://localhost:3000'
+      ]
     : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

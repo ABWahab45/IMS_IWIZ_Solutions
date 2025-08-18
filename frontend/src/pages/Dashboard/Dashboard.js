@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/axiosConfig';
+import ApiTest from '../../components/Common/ApiTest';
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -290,6 +291,13 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* API Test Component - Temporary for debugging */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <ApiTest />
         </div>
       </div>
 
