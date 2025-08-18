@@ -220,6 +220,22 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/list-users
+// @desc    List all users (temporary for debugging)
+// @access  Public
+router.get('/list-users', async (req, res) => {
+  try {
+    const users = await User.find({}).select('firstName lastName email role createdAt isActive');
+    res.json({
+      count: users.length,
+      users: users
+    });
+  } catch (error) {
+    console.error('List users error:', error);
+    res.status(500).json({ message: 'Error listing users' });
+  }
+});
+
 // @route   POST /api/auth/debug-password
 // @desc    Debug password comparison (temporary)
 // @access  Public
