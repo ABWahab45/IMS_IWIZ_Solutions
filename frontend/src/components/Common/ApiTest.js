@@ -10,7 +10,22 @@ const ApiTest = () => {
     setTestResult(null);
     
     try {
-      const result = await apiService.testConnection();
+      // Test with direct fetch to bypass any service worker issues
+      const response = await fetch('https://ims-iwiz-solutions.onrender.com/api/health', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('Direct fetch response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
       setTestResult({ success: true, data: result });
     } catch (error) {
       setTestResult({ success: false, error: error.message });
@@ -24,15 +39,57 @@ const ApiTest = () => {
     setTestResult(null);
     
     try {
-      // Test register endpoint
-      const registerResponse = await apiService.post('/auth/register', {
-        firstName: 'Test',
-        lastName: 'User',
-        email: 'test@example.com',
-        password: 'password123',
-        role: 'manager'
+      // Test register endpoint with direct fetch
+      const response = await fetch('https://ims-iwiz-solutions.onrender.com/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'test@example.com',
+          password: 'password123',
+          role: 'manager'
+        }),
       });
-      setTestResult({ success: true, data: registerResponse });
+      
+      console.log('Auth endpoint response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      setTestResult({ success: true, data: result });
+    } catch (error) {
+      setTestResult({ success: false, error: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testBackendReachability = async () => {
+    setLoading(true);
+    setTestResult(null);
+    
+    try {
+      // Simple test to see if the backend is reachable
+      const response = await fetch('https://ims-iwiz-solutions.onrender.com/', {
+        method: 'GET',
+      });
+      
+      console.log('Backend root response status:', response.status);
+      
+      const result = {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        url: response.url
+      };
+      
+      setTestResult({ success: true, data: result });
     } catch (error) {
       setTestResult({ success: false, error: error.message });
     } finally {
@@ -59,6 +116,14 @@ const ApiTest = () => {
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 ml-2"
         >
           {loading ? 'Testing...' : 'Test Auth Endpoints'}
+        </button>
+        
+        <button
+          onClick={testBackendReachability}
+          disabled={loading}
+          className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:opacity-50 ml-2"
+        >
+          {loading ? 'Testing...' : 'Test Backend Reachability'}
         </button>
       </div>
 
