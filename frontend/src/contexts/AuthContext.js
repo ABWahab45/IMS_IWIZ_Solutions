@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import api from '../services/axiosConfig';
 
 const AuthContext = createContext();
 
@@ -104,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     if (state.token) {
       setAuthToken(state.token);
       try {
-        const response = await axios.get('/api/auth/me');
+        const response = await api.get('/auth/me');
         dispatch({
           type: AUTH_ACTIONS.LOAD_USER,
           payload: response.data.user
@@ -122,7 +123,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
     
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email,
         password
       });
@@ -152,7 +153,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
     
     try {
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await api.post('/auth/register', userData);
       
       const { token, user } = response.data;
       
@@ -183,7 +184,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (userData) => {
     try {
-      const response = await axios.put('/api/auth/profile', userData);
+      const response = await api.put('/auth/profile', userData);
       
       dispatch({
         type: AUTH_ACTIONS.UPDATE_USER,
@@ -201,7 +202,7 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put('/api/auth/change-password', {
+      await api.put('/auth/change-password', {
         currentPassword,
         newPassword
       });
