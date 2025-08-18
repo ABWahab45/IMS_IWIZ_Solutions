@@ -35,9 +35,20 @@ router.post('/register', authLimiter, validateUser, async (req, res) => {
 
     const { firstName, lastName, email, password, role, phone } = req.body;
 
+    console.log('=== REGISTRATION DEBUG ===');
+    console.log('Registration data:', {
+      firstName,
+      lastName,
+      email,
+      passwordLength: password.length,
+      role,
+      phone
+    });
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists with email:', email);
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
@@ -52,6 +63,11 @@ router.post('/register', authLimiter, validateUser, async (req, res) => {
     });
 
     await user.save();
+    console.log('User saved successfully:', {
+      id: user._id,
+      email: user.email,
+      passwordHash: user.password.substring(0, 30) + '...'
+    });
 
     // Generate token
     const token = generateToken(user._id);
@@ -82,7 +98,7 @@ router.post('/register', authLimiter, validateUser, async (req, res) => {
 // @desc    Login user
 // @access  Public
 router.post('/login', authLimiter, [
-  body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
+  body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
   try {
@@ -93,20 +109,55 @@ router.post('/login', authLimiter, [
 
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    console.log('=== LOGIN DEBUG ===');
+    console.log('Received email:', email);
+    console.log('Received password length:', password.length);
+
+    // Find user by email (try different variations)
+    let user = null;
+    const emailVariations = [
+      email,
+      email.toLowerCase(),
+      email.trim(),
+      email.toLowerCase().trim()
+    ];
+    
+    for (const variation of emailVariations) {
+      user = await User.findOne({ email: variation });
+      if (user) {
+        console.log('User found with email variation:', variation);
+        break;
+      }
+    }
+    
     if (!user) {
+      console.log('User not found for any email variation:', emailVariations);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('User found:', {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      isActive: user.isActive,
+      passwordHash: user.password.substring(0, 20) + '...'
+    });
+
     // Check if user is active
     if (!user.isActive) {
+      console.log('User is inactive');
       return res.status(400).json({ message: 'Account is deactivated. Please contact administrator.' });
     }
 
     // Check password
+    console.log('About to compare password...');
     const isMatch = await user.comparePassword(password);
+    console.log('Password match result:', isMatch);
+    
     if (!isMatch) {
+      console.log('Password does not match');
+      console.log('Stored password hash:', user.password);
+      console.log('Attempted password length:', password.length);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -133,6 +184,61 @@ router.post('/login', authLimiter, [
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
+  }
+});
+
+// @route   POST /api/auth/debug-password
+// @desc    Debug password comparison (temporary)
+// @access  Public
+router.post('/debug-password', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    console.log('=== PASSWORD DEBUG ===');
+    console.log('Original email:', email);
+    console.log('Password length:', password.length);
+    
+    // Test different email variations
+    const emailVariations = [
+      email,
+      email.toLowerCase(),
+      email.trim(),
+      email.toLowerCase().trim()
+    ];
+    
+    let user = null;
+    let foundWithVariation = null;
+    
+    for (const variation of emailVariations) {
+      user = await User.findOne({ email: variation });
+      if (user) {
+        foundWithVariation = variation;
+        break;
+      }
+    }
+    
+    if (!user) {
+      return res.status(404).json({ 
+        message: 'User not found',
+        testedVariations: emailVariations
+      });
+    }
+    
+    const isMatch = await user.comparePassword(password);
+    
+    res.json({
+      userFound: true,
+      userId: user._id,
+      userEmail: user.email,
+      foundWithVariation: foundWithVariation,
+      passwordMatch: isMatch,
+      passwordHash: user.password.substring(0, 30) + '...',
+      createdAt: user.createdAt,
+      testedVariations: emailVariations
+    });
+  } catch (error) {
+    console.error('Password debug error:', error);
+    res.status(500).json({ message: 'Debug error' });
   }
 });
 
