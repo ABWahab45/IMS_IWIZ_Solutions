@@ -98,14 +98,18 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/handovers', require('./routes/handovers'));
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+// API-only server - frontend is deployed separately on Vercel
+// No need to serve static files since frontend and backend are separate
+
+// Root endpoint for Render health checks
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'IWIZ Solutions Inventory Management API',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   });
-}
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
