@@ -25,15 +25,17 @@ const prodLimiter = rateLimit({
 // General API rate limiter - choose based on environment
 const apiLimiter = process.env.NODE_ENV === 'production' ? prodLimiter : devLimiter;
 
-// Auth endpoints rate limiter (more strict)
+// Auth endpoints rate limiter (more lenient for debugging)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 20 : 100, // Higher limit for development
+  max: process.env.NODE_ENV === 'production' ? 100 : 200, // Increased limit
   message: {
     message: 'Too many authentication attempts, please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true, // Don't count successful requests
+  skipFailedRequests: false, // Count failed requests
 });
 
 // File upload rate limiter

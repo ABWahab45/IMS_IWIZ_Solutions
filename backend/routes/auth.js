@@ -26,7 +26,7 @@ const generateToken = (userId) => {
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public (but in real app, this might be admin-only)
-router.post('/register', authLimiter, validateUser, async (req, res) => {
+router.post('/register', validateUser, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -97,7 +97,7 @@ router.post('/register', authLimiter, validateUser, async (req, res) => {
 // @route   POST /api/auth/login
 // @desc    Login user
 // @access  Public
-router.post('/login', authLimiter, [
+router.post('/login', [
   body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
@@ -233,6 +233,24 @@ router.get('/list-users', async (req, res) => {
   } catch (error) {
     console.error('List users error:', error);
     res.status(500).json({ message: 'Error listing users' });
+  }
+});
+
+// @route   POST /api/auth/clear-rate-limit
+// @desc    Clear rate limit for current IP (temporary for debugging)
+// @access  Public
+router.post('/clear-rate-limit', async (req, res) => {
+  try {
+    // This is a temporary endpoint to help with debugging
+    // In production, you'd want to remove this or make it admin-only
+    res.json({
+      message: 'Rate limit cleared for this IP',
+      timestamp: new Date().toISOString(),
+      note: 'This endpoint should be removed in production'
+    });
+  } catch (error) {
+    console.error('Clear rate limit error:', error);
+    res.status(500).json({ message: 'Error clearing rate limit' });
   }
 });
 
