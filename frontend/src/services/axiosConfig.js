@@ -1,10 +1,23 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// Determine API URL based on environment
+const getApiBaseUrl = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  if (window.location.hostname !== 'localhost') {
+    return 'https://ims-iwiz-solutions.onrender.com/api';
+  }
+  
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
