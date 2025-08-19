@@ -44,6 +44,9 @@ router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterErro
 
     let avatarUrl = '';
     if (req.file) {
+      console.log('Registration - Uploaded file:', req.file);
+      console.log('Registration - File path:', req.file.path);
+      console.log('Registration - File filename:', req.file.filename);
       avatarUrl = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
@@ -208,6 +211,9 @@ router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
     if (phone) user.phone = phone;
 
     if (req.file) {
+      console.log('Profile Update - Uploaded file:', req.file);
+      console.log('Profile Update - File path:', req.file.path);
+      console.log('Profile Update - File filename:', req.file.filename);
       user.avatar = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
