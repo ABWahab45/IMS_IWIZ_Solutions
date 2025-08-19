@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import { getAvatarImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../../components/Common/ImageWithFallback';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -167,23 +167,15 @@ const Users = () => {
                       <td>
                         <div className="d-flex align-items-center">
                           <div className="avatar-sm me-3">
-                            {user.avatar ? (
-                              <img
-                                src={getAvatarImageUrl(user.avatar)}
-                                alt={user.firstName}
-                                className="rounded-circle"
-                                width="40"
-                                height="40"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
-                                }}
-                              />
-                            ) : (
-                              <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{width: '40px', height: '40px'}}>
-                                {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-                              </div>
-                            )}
+                            <ImageWithFallback
+                              src={user.avatar}
+                              alt={user.firstName}
+                              type="avatar"
+                              className="rounded-circle"
+                              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                              placeholderText=""
+                              showPlaceholder={true}
+                            />
                           </div>
                           <div>
                             <strong>{user.firstName} {user.lastName}</strong>

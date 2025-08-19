@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import { getAvatarImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../../components/Common/ImageWithFallback';
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
@@ -102,23 +102,20 @@ const Profile = () => {
           <div className="card">
             <div className="card-body text-center">
               <div className="mb-3">
-                {user?.avatar ? (
-                  <img
-                    src={getAvatarImageUrl(user.avatar)}
-                    alt={user.firstName}
-                    className="rounded-circle"
-                    width="100"
-                    height="100"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : (
-                  <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style={{width: '100px', height: '100px', fontSize: '2rem'}}>
-                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                  </div>
-                )}
+                <ImageWithFallback
+                  src={user?.avatar}
+                  alt={user?.firstName}
+                  type="avatar"
+                  className="rounded-circle mx-auto"
+                  style={{ 
+                    width: '100px', 
+                    height: '100px', 
+                    objectFit: 'cover',
+                    fontSize: '2rem'
+                  }}
+                  placeholderText=""
+                  showPlaceholder={true}
+                />
               </div>
               <h5>{user?.firstName} {user?.lastName}</h5>
               <p className="text-muted">{user?.email}</p>

@@ -18,7 +18,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
+
 import Dashboard from './pages/Dashboard/Dashboard';
 import InventoryList from './pages/Inventory/InventoryList';
 import AddInventory from './pages/Inventory/AddInventory';
@@ -51,7 +51,6 @@ function App() {
               <div className="App">
                 <Routes>
                   <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
                   
                   <Route path="/*" element={
                     <PrivateRoute>

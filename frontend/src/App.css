@@ -319,7 +319,7 @@ code {
 .sidebar-nav .nav-link:hover {
   background: var(--sidebar-hover);
   color: white;
-  transform: translateX(4px);
+  transition: all 0.2s ease;
 }
 
 .sidebar-nav .nav-link.active {
