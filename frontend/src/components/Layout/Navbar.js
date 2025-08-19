@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import ThemeToggle from '../Common/ThemeToggle';
-import { getAvatarImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../Common/ImageWithFallback';
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -73,23 +73,15 @@ const Navbar = () => {
             onClick={toggleUserMenu}
           >
             <div className="d-flex align-items-center">
-              {user?.avatar ? (
-                <img
-                  src={getAvatarImageUrl(user.avatar)}
-                  alt={user.firstName}
-                  className="rounded-circle me-2"
-                  width="32"
-                  height="32"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : (
-                <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
-                  <i className="fas fa-user text-white" style={{ fontSize: '0.875rem' }}></i>
-                </div>
-              )}
+              <ImageWithFallback
+                src={user?.avatar}
+                alt={user?.firstName}
+                type="avatar"
+                className="rounded-circle me-2"
+                style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                placeholderText=""
+                showPlaceholder={true}
+              />
               <div className="text-start d-none d-md-block">
                 <div className="fw-medium" style={{ fontSize: '0.875rem' }}>
                   {user?.firstName} {user?.lastName}

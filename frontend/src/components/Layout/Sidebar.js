@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
-import { getAvatarImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../Common/ImageWithFallback';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -112,23 +112,15 @@ const Sidebar = () => {
         <div className="px-3 py-2 border-bottom border-light border-opacity-25">
           <div className="d-flex align-items-center">
             <div className="me-2">
-              {user.avatar ? (
-                <img
-                  src={getAvatarImageUrl(user.avatar)}
-                  alt={user.firstName}
-                  className="rounded-circle"
-                  width="32"
-                  height="32"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : (
-                <div className="bg-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
-                  <i className="fas fa-user text-primary"></i>
-                </div>
-              )}
+              <ImageWithFallback
+                src={user.avatar}
+                alt={user.firstName}
+                type="avatar"
+                className="rounded-circle"
+                style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                placeholderText=""
+                showPlaceholder={true}
+              />
             </div>
             <div className="flex-grow-1 text-truncate">
               <div className="text-white fw-medium" style={{ fontSize: '0.875rem' }}>

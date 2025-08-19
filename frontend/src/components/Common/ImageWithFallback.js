@@ -34,6 +34,18 @@ const ImageWithFallback = ({
 
   // If no image source provided, show placeholder
   if (!src) {
+    if (type === 'avatar' && placeholderText === '') {
+      // For avatars with empty placeholder text, show just the icon
+      return (
+        <div 
+          className={`bg-primary rounded-circle d-flex align-items-center justify-content-center ${className}`}
+          style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <i className="fas fa-user text-white" style={{ fontSize: '0.875rem' }}></i>
+        </div>
+      );
+    }
+    
     return (
       <div 
         className={`image-placeholder text-center bg-secondary bg-opacity-10 rounded ${className}`}
@@ -49,6 +61,18 @@ const ImageWithFallback = ({
 
   // If image failed to load and no fallback, show placeholder
   if (imageError && !fallbackSrc && showPlaceholder) {
+    if (type === 'avatar' && placeholderText === '') {
+      // For avatars with empty placeholder text, show just the icon
+      return (
+        <div 
+          className={`bg-primary rounded-circle d-flex align-items-center justify-content-center ${className}`}
+          style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <i className="fas fa-user text-white" style={{ fontSize: '0.875rem' }}></i>
+        </div>
+      );
+    }
+    
     return (
       <div 
         className={`image-placeholder text-center bg-secondary bg-opacity-10 rounded ${className}`}

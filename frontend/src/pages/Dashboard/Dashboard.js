@@ -274,7 +274,7 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {hasPermission('canRequestHandover') && (
+                {hasPermission('canRequestHandover') && !isAdmin() && !isManagerOrAbove() && (
                   <div className="col-6">
                     <Link to="/inventory/request-handover" className="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
                       <i className="fas fa-hand-holding-heart fa-2x mb-2"></i>
