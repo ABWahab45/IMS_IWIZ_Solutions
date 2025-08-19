@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import { getProductImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../../components/Common/ImageWithFallback';
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -154,37 +154,23 @@ const ProductDetail = () => {
                 </div>
                 
                 <div className="col-md-6">
-                  {product.images && product.images.length > 0 ? (
-                    <div className="product-images">
-                      <img
-                        src={getProductImageUrl(product.images[0])}
-                        alt={product.name}
-                        className="img-fluid rounded"
-                        style={{ maxHeight: '300px', width: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          console.error('Image failed to load:', e.target.src);
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                      />
-                      <div className="text-center p-4 bg-secondary bg-opacity-10 rounded" style={{ display: 'none', maxHeight: '300px' }}>
-                        <i className="fas fa-image fa-3x text-muted mb-2"></i>
-                        <p className="text-muted">Image not available</p>
+                  <div className="product-images">
+                    <ImageWithFallback
+                      src={product.images && product.images.length > 0 ? product.images[0] : null}
+                      alt={product.name}
+                      type="product"
+                      className="img-fluid rounded"
+                      style={{ maxHeight: '300px', width: '100%', objectFit: 'cover' }}
+                      placeholderText="No images available"
+                    />
+                    {product.images && product.images.length > 1 && (
+                      <div className="mt-2">
+                        <small className="text-muted">
+                          +{product.images.length - 1} more image(s)
+                        </small>
                       </div>
-                      {product.images.length > 1 && (
-                        <div className="mt-2">
-                          <small className="text-muted">
-                            +{product.images.length - 1} more image(s)
-                          </small>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-center p-4 bg-secondary bg-opacity-10 rounded">
-                      <i className="fas fa-image fa-3x text-muted mb-2"></i>
-                      <p className="text-muted">No images available</p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

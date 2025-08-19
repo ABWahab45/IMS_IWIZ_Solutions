@@ -68,7 +68,7 @@ class ProductController {
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
           images.push({
-            url: `/uploads/products/${file.filename}`,
+            url: file.filename, // Store just the filename
             alt: `${name} image ${index + 1}`,
             isPrimary: index === 0
           });
@@ -134,7 +134,7 @@ class ProductController {
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
           images.push({
-            url: `/uploads/products/${file.filename}`,
+            url: file.filename, // Store just the filename
             alt: `${name} image ${index + 1}`,
             isPrimary: index === 0
           });

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/axiosConfig';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import { getProductImageUrl } from '../../utils/imageUtils';
+import ImageWithFallback from '../../components/Common/ImageWithFallback';
 import { useAuth } from '../../contexts/AuthContext';
 
 const InventoryList = () => {
@@ -241,24 +241,14 @@ const InventoryList = () => {
                         </td>
                         <td>
                           <div className="d-flex align-items-center">
-                            {product.images && product.images.length > 0 ? (
-                              <img
-                                src={getProductImageUrl(product.images[0])}
-                                alt={product.name}
-                                className="rounded me-3"
-                                style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                                onError={(e) => {
-                                  console.error('Image failed to load:', e.target.src);
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
-                                }}
-
-                              />
-                            ) : (
-                              <div className="bg-secondary bg-opacity-10 rounded me-3 d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-                                <i className="fas fa-image text-muted"></i>
-                              </div>
-                            )}
+                            <ImageWithFallback
+                              src={product.images && product.images.length > 0 ? product.images[0] : null}
+                              alt={product.name}
+                              type="product"
+                              className="rounded me-3"
+                              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                              placeholderText="No image"
+                            />
                             <div>
                               <div className="fw-medium">{product.name}</div>
                               {product.description && (

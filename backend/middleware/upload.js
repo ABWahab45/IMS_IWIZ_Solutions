@@ -6,6 +6,7 @@ const fs = require('fs');
 const ensureDirectoryExists = (dirPath) => {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`Created upload directory: ${dirPath}`);
   }
 };
 
@@ -29,14 +30,16 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    // Generate unique filename
+    // Generate unique filename with timestamp and random suffix
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const extension = path.extname(file.originalname);
     const baseName = path.basename(file.originalname, extension)
       .replace(/[^a-zA-Z0-9]/g, '_')
       .substring(0, 20);
     
-    cb(null, baseName + '-' + uniqueSuffix + extension);
+    const filename = baseName + '-' + uniqueSuffix + extension;
+    console.log(`Generated filename: ${filename} for ${file.originalname}`);
+    cb(null, filename);
   }
 });
 
@@ -53,8 +56,10 @@ const fileFilter = (req, file, cb) => {
     .test(file.mimetype);
 
   if (mimetype && extname) {
+    console.log(`File accepted: ${file.originalname} (${file.mimetype})`);
     return cb(null, true);
   } else {
+    console.log(`File rejected: ${file.originalname} (${file.mimetype})`);
     cb(new Error('Invalid file type. Only images (JPEG, PNG, GIF, WebP) and documents (PDF, DOC, DOCX, XLS, XLSX, TXT) are allowed.'));
   }
 };
@@ -62,39 +67,49 @@ const fileFilter = (req, file, cb) => {
 // Multer configuration
 const upload = multer({
   storage: storage,
+  fileFilter: fileFilter,
   limits: {
     fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5000000, // 5MB default
     files: 10 // Maximum 10 files per request
-  },
-  fileFilter: fileFilter
+  }
 });
 
-// Error handling middleware
+// Error handling middleware for multer
 const handleMulterError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
+    console.error('Multer error:', error);
+    
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
-        message: 'File too large',
-        error: 'File size exceeds the maximum limit of 5MB'
+        message: 'File too large. Maximum file size is 5MB.',
+        error: error.message
       });
     }
+    
     if (error.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({
-        message: 'Too many files',
-        error: 'Maximum 10 files allowed per request'
+        message: 'Too many files. Maximum 10 files allowed.',
+        error: error.message
       });
     }
+    
     if (error.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).json({
-        message: 'Unexpected field',
-        error: 'Unexpected file field in request'
+        message: 'Unexpected file field.',
+        error: error.message
       });
     }
+    
+    return res.status(400).json({
+      message: 'File upload error',
+      error: error.message
+    });
   }
   
-  if (error.message.includes('Invalid file type')) {
+  if (error) {
+    console.error('Upload error:', error);
     return res.status(400).json({
-      message: 'Invalid file type',
+      message: 'File upload failed',
       error: error.message
     });
   }
@@ -121,8 +136,44 @@ const uploadConfigs = {
   ])
 };
 
+// Utility function to get file URL
+const getFileUrl = (filename, type = 'product') => {
+  if (!filename) return null;
+  
+  // If it's already a full URL, return as is
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  
+  // If it's already a relative path, return as is
+  if (filename.startsWith('/uploads/')) {
+    return filename;
+  }
+  
+  // Construct the path based on type
+  if (type === 'avatar') {
+    return `/uploads/avatars/${filename}`;
+  } else if (type === 'product') {
+    return `/uploads/products/${filename}`;
+  } else if (type === 'document') {
+    return `/uploads/documents/${filename}`;
+  }
+  
+  return `/uploads/misc/${filename}`;
+};
+
+// Utility function to validate file exists
+const validateFileExists = (filePath) => {
+  if (!filePath) return false;
+  
+  const fullPath = path.join(process.cwd(), filePath.startsWith('/') ? filePath.slice(1) : filePath);
+  return fs.existsSync(fullPath);
+};
+
 module.exports = {
   upload,
   uploadConfigs,
-  handleMulterError
+  handleMulterError,
+  getFileUrl,
+  validateFileExists
 };

@@ -142,7 +142,7 @@ router.post('/', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterErr
     // Process uploaded avatar
     let avatarUrl = '';
     if (req.file) {
-      avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      avatarUrl = req.file.filename; // Store just the filename
     }
 
     // Create new user
@@ -204,7 +204,7 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
     // Process new avatar if uploaded
     const updateData = { ...req.body };
     if (req.file) {
-      updateData.avatar = `/uploads/avatars/${req.file.filename}`;
+      updateData.avatar = req.file.filename; // Store just the filename
     }
 
     // Don't allow users to update their own admin status
