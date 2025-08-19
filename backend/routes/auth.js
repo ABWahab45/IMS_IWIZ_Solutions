@@ -44,7 +44,7 @@ router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterErro
 
     let avatarUrl = '';
     if (req.file) {
-      avatarUrl = req.file.filename;
+      avatarUrl = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
     const user = new User({
@@ -208,7 +208,7 @@ router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
     if (phone) user.phone = phone;
 
     if (req.file) {
-      user.avatar = req.file.filename;
+      user.avatar = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
     await user.save();

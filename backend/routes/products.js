@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const { auth } = require('../middleware/auth');
-const { upload, uploadConfigs, handleMulterError } = require('../middleware/upload');
+const { uploadConfigs, handleMulterError } = require('../middleware/upload');
 const { body, validationResult } = require('express-validator');
 const { validateProduct } = require('../middleware/validation');
 const { uploadLimiter } = require('../middleware/rateLimit');
@@ -108,7 +108,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products - Create new product
-router.post('/', auth, uploadLimiter, upload.array('productImages', 5), validateProduct, async (req, res) => {
+router.post('/', auth, uploadLimiter, uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -157,7 +157,7 @@ router.post('/', auth, uploadLimiter, upload.array('productImages', 5), validate
     // Handle image upload
     if (req.files && req.files.length > 0) {
       productData.images = req.files.map((file, index) => ({
-        url: file.filename, // Store just the filename
+        url: file.path, // Cloudinary returns the full URL in file.path
         alt: req.body.name,
         isPrimary: index === 0
       }));
@@ -200,7 +200,7 @@ router.post('/', auth, uploadLimiter, upload.array('productImages', 5), validate
 });
 
 // PUT /api/products/:id - Update product
-router.put('/:id', auth, upload.array('productImages', 5), validateProduct, async (req, res) => {
+router.put('/:id', auth, uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -240,7 +240,7 @@ router.put('/:id', auth, upload.array('productImages', 5), validateProduct, asyn
     // Handle image upload
     if (req.files && req.files.length > 0) {
       updateData.images = req.files.map((file, index) => ({
-        url: file.filename, // Store just the filename
+        url: file.path, // Cloudinary returns the full URL in file.path
         alt: req.body.name,
         isPrimary: index === 0
       }));

@@ -68,7 +68,7 @@ class ProductController {
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
           images.push({
-            url: file.filename, // Store just the filename
+            url: file.path, // Cloudinary returns the full URL in file.path
             alt: `${name} image ${index + 1}`,
             isPrimary: index === 0
           });
@@ -134,7 +134,7 @@ class ProductController {
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
           images.push({
-            url: file.filename, // Store just the filename
+            url: file.path, // Cloudinary returns the full URL in file.path
             alt: `${name} image ${index + 1}`,
             isPrimary: index === 0
           });

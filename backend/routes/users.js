@@ -128,7 +128,7 @@ router.post('/', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterErr
 
     let avatarUrl = '';
     if (req.file) {
-      avatarUrl = req.file.filename;
+      avatarUrl = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
     const user = new User({
@@ -214,7 +214,7 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
     if (phone) user.phone = phone;
 
     if (req.file) {
-      user.avatar = req.file.filename;
+      user.avatar = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
     await user.save();
