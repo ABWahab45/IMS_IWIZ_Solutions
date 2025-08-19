@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import { getAvatarUrl } from '../../utils/imageUtils';
+import { getAvatarImageUrl } from '../../utils/imageUtils';
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
@@ -104,7 +104,7 @@ const Profile = () => {
               <div className="mb-3">
                 {user?.avatar ? (
                   <img
-                    src={getAvatarUrl(user.avatar)}
+                    src={getAvatarImageUrl(user.avatar)}
                     alt={user.firstName}
                     className="rounded-circle"
                     width="100"

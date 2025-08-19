@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
-import { getAvatarUrl } from '../../utils/imageUtils';
+import { getAvatarImageUrl } from '../../utils/imageUtils';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -114,7 +114,7 @@ const Sidebar = () => {
             <div className="me-2">
               {user.avatar ? (
                 <img
-                  src={getAvatarUrl(user.avatar)}
+                  src={getAvatarImageUrl(user.avatar)}
                   alt={user.firstName}
                   className="rounded-circle"
                   width="32"

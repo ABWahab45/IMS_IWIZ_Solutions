@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
-import { getImageUrl, getAvatarUrl, getProductImageUrl } from '../../utils/imageUtils';
+import { getImageUrl, getAvatarImageUrl, getProductImageUrl } from '../../utils/imageUtils';
 
 const ApiTest = () => {
   const [testResults, setTestResults] = useState({});

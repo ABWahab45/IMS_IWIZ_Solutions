@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import ThemeToggle from '../Common/ThemeToggle';
-import { getAvatarUrl } from '../../utils/imageUtils';
+import { getAvatarImageUrl } from '../../utils/imageUtils';
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -75,7 +75,7 @@ const Navbar = () => {
             <div className="d-flex align-items-center">
               {user?.avatar ? (
                 <img
-                  src={getAvatarUrl(user.avatar)}
+                  src={getAvatarImageUrl(user.avatar)}
                   alt={user.firstName}
                   className="rounded-circle me-2"
                   width="32"

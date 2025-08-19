@@ -76,10 +76,7 @@ mongoose.connect(MONGODB_URI, {
   process.exit(1);
 });
 
-// Enable query debugging in development
-if (process.env.NODE_ENV === 'development') {
-  mongoose.set('debug', true);
-}
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

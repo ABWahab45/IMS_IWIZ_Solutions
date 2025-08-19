@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import { getAvatarUrl } from '../../utils/imageUtils';
+import { getAvatarImageUrl } from '../../utils/imageUtils';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -169,7 +169,7 @@ const Users = () => {
                           <div className="avatar-sm me-3">
                             {user.avatar ? (
                               <img
-                                src={getAvatarUrl(user.avatar)}
+                                src={getAvatarImageUrl(user.avatar)}
                                 alt={user.firstName}
                                 className="rounded-circle"
                                 width="40"
