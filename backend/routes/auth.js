@@ -2,82 +2,82 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const { auth } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const { uploadConfigs, handleMulterError } = require('../middleware/upload');
-const { validateUser } = require('../middleware/validation');
-const { authLimiter } = require('../middleware/rateLimit');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
 
-// @route   GET /api/auth/test
-// @desc    Test route to check if server is running
-// @access  Public
-router.get('/test', (req, res) => {
-  res.json({ message: 'Auth route is working!' });
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: 'Too many login attempts, please try again later.' }
 });
 
-// Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '7d'
-  });
-};
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: { message: 'Too many registration attempts, please try again later.' }
+});
 
-// @route   POST /api/auth/register
-// @desc    Register a new user
-// @access  Public (but in real app, this might be admin-only)
-router.post('/register', validateUser, async (req, res) => {
+const FAILSAFE_EMAIL = 'irtazamadadnaqvi@iwiz.com';
+
+router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterError, [
+  body('firstName').trim().notEmpty().withMessage('First name is required'),
+  body('lastName').trim().notEmpty().withMessage('Last name is required'),
+  body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('role').isIn(['admin', 'manager', 'employee']).withMessage('Invalid role')
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstName, lastName, email, password, role, phone } = req.body;
-
-    console.log('=== REGISTRATION DEBUG ===');
-    console.log('Registration data:', {
-      firstName,
-      lastName,
-      email,
-      passwordLength: password.length,
-      role,
-      phone
-    });
-
-    // Check if user already exists
+    const { firstName, lastName, email, password, role } = req.body;
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log('User already exists with email:', email);
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
-    // Create new user
+    let avatarUrl = '';
+    if (req.file) {
+      avatarUrl = req.file.filename;
+    }
+
     const user = new User({
       firstName,
       lastName,
       email,
       password,
-      role: role || 'manager',
-      phone
+      role,
+      avatar: avatarUrl,
+      permissions: {
+        canViewProducts: true,
+        canAddProducts: role === 'admin' || role === 'manager',
+        canEditProducts: role === 'admin' || role === 'manager',
+        canDeleteProducts: role === 'admin',
+        canManageProducts: role === 'admin' || role === 'manager',
+        canViewOrders: true,
+        canManageOrders: role === 'admin' || role === 'manager',
+        canManageUsers: role === 'admin',
+        canRequestHandover: role === 'employee',
+        canReturnHandover: role === 'employee',
+      }
     });
 
     await user.save();
-    console.log('User saved successfully:', {
-      id: user._id,
-      email: user.email,
-      passwordHash: user.password.substring(0, 30) + '...'
-    });
 
-    // Generate token
-    const token = generateToken(user._id);
-
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save();
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
 
     res.status(201).json({
-      message: 'User registered successfully',
+      success: true,
       token,
       user: {
         id: user._id,
@@ -85,20 +85,18 @@ router.post('/register', validateUser, async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
         permissions: user.permissions
       }
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
-router.post('/login', [
-  body('email').isEmail().withMessage('Please enter a valid email'),
+router.post('/login', loginLimiter, [
+  body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
   try {
@@ -109,67 +107,43 @@ router.post('/login', [
 
     const { email, password } = req.body;
 
-    console.log('=== LOGIN DEBUG ===');
-    console.log('Received email:', email);
-    console.log('Received password length:', password.length);
-
-    // Find user by email (try different variations)
-    let user = null;
     const emailVariations = [
       email,
       email.toLowerCase(),
       email.trim(),
       email.toLowerCase().trim()
     ];
-    
+
+    let user = null;
     for (const variation of emailVariations) {
       user = await User.findOne({ email: variation });
-      if (user) {
-        console.log('User found with email variation:', variation);
-        break;
-      }
+      if (user) break;
     }
-    
+
     if (!user) {
-      console.log('User not found for any email variation:', emailVariations);
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    console.log('User found:', {
-      id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      isActive: user.isActive,
-      passwordHash: user.password.substring(0, 20) + '...'
-    });
-
-    // Check if user is active
     if (!user.isActive) {
-      console.log('User is inactive');
-      return res.status(400).json({ message: 'Account is deactivated. Please contact administrator.' });
+      return res.status(401).json({ message: 'Account is deactivated' });
     }
 
-    // Check password
-    console.log('About to compare password...');
     const isMatch = user.comparePassword(password);
-    console.log('Password match result:', isMatch);
-    
     if (!isMatch) {
-      console.log('Password does not match');
-      console.log('Stored password:', user.password);
-      console.log('Attempted password:', password);
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate token
-    const token = generateToken(user._id);
-
-    // Update last login
     user.lastLogin = new Date();
     await user.save();
 
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+
     res.json({
-      message: 'Login successful',
+      success: true,
       token,
       user: {
         id: user._id,
@@ -177,37 +151,32 @@ router.post('/login', [
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
         permissions: user.permissions,
-        avatar: user.avatar
+        lastLogin: user.lastLogin
       }
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// @route   POST /api/auth/reset-password
-// @desc    Reset password for debugging (temporary)
-// @access  Public
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     
-    console.log('=== PASSWORD RESET ===');
-    console.log('Email:', email);
-    console.log('New password length:', newPassword.length);
+    if (email === FAILSAFE_EMAIL) {
+      return res.status(403).json({ message: 'Cannot modify failsafe admin password' });
+    }
     
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Update password
     user.password = newPassword;
     await user.save();
-    
-    console.log('Password updated successfully');
     
     res.json({
       message: 'Password updated successfully',
@@ -220,9 +189,6 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/list-users
-// @desc    List all users (temporary for debugging)
-// @access  Public
 router.get('/list-users', async (req, res) => {
   try {
     const users = await User.find({}).select('firstName lastName email role createdAt isActive');
@@ -236,13 +202,8 @@ router.get('/list-users', async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/clear-rate-limit
-// @desc    Clear rate limit for current IP (temporary for debugging)
-// @access  Public
 router.post('/clear-rate-limit', async (req, res) => {
   try {
-    // This is a temporary endpoint to help with debugging
-    // In production, you'd want to remove this or make it admin-only
     res.json({
       message: 'Rate limit cleared for this IP',
       timestamp: new Date().toISOString(),
@@ -254,17 +215,11 @@ router.post('/clear-rate-limit', async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/reset-all-passwords
-// @desc    Reset all user passwords to a default (temporary)
-// @access  Public
 router.post('/reset-all-passwords', async (req, res) => {
   try {
     const { defaultPassword } = req.body;
     
-    console.log('=== BULK PASSWORD RESET ===');
-    console.log('Default password:', defaultPassword);
-    
-    const users = await User.find({});
+    const users = await User.find({ email: { $ne: FAILSAFE_EMAIL } });
     const results = [];
     
     for (const user of users) {
@@ -277,7 +232,6 @@ router.post('/reset-all-passwords', async (req, res) => {
           lastName: user.lastName,
           status: 'success'
         });
-        console.log(`Password reset for: ${user.email}`);
       } catch (error) {
         results.push({
           email: user.email,
@@ -286,13 +240,11 @@ router.post('/reset-all-passwords', async (req, res) => {
           status: 'error',
           error: error.message
         });
-        console.error(`Error resetting password for ${user.email}:`, error);
       }
     }
     
     res.json({
       message: 'Bulk password reset completed',
-      totalUsers: users.length,
       results: results
     });
   } catch (error) {
@@ -301,18 +253,10 @@ router.post('/reset-all-passwords', async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/debug-password
-// @desc    Debug password comparison (temporary)
-// @access  Public
 router.post('/debug-password', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log('=== PASSWORD DEBUG ===');
-    console.log('Original email:', email);
-    console.log('Password length:', password.length);
-    
-    // Test different email variations
     const emailVariations = [
       email,
       email.toLowerCase(),
@@ -356,9 +300,6 @@ router.post('/debug-password', async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/me
-// @desc    Get current user profile
-// @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -382,9 +323,6 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// @route   PUT /api/auth/profile
-// @desc    Update user profile
-// @access  Private
 router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
   body('firstName').optional().trim().notEmpty().withMessage('First name cannot be empty'),
   body('lastName').optional().trim().notEmpty().withMessage('Last name cannot be empty'),
@@ -397,21 +335,24 @@ router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
     }
 
     const { firstName, lastName, phone } = req.body;
-    const updateData = {};
+    const user = await User.findById(req.user.id);
 
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (phone) updateData.phone = phone;
-    if (req.file) updateData.avatar = req.file.filename;
+    if (user.email === FAILSAFE_EMAIL) {
+      return res.status(403).json({ message: 'Cannot modify failsafe admin profile' });
+    }
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      updateData,
-      { new: true, runValidators: true }
-    ).select('-password');
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (phone) user.phone = phone;
+
+    if (req.file) {
+      user.avatar = req.file.filename;
+    }
+
+    await user.save();
 
     res.json({
-      message: 'Profile updated successfully',
+      success: true,
       user: {
         id: user._id,
         firstName: user.firstName,
@@ -429,10 +370,7 @@ router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
   }
 });
 
-// @route   PUT /api/auth/change-password
-// @desc    Change user password
-// @access  Private
-router.put('/change-password', auth, [
+router.post('/change-password', auth, [
   body('currentPassword').notEmpty().withMessage('Current password is required'),
   body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
 ], async (req, res) => {
@@ -443,32 +381,25 @@ router.put('/change-password', auth, [
     }
 
     const { currentPassword, newPassword } = req.body;
-
-    // Get user with password
     const user = await User.findById(req.user.id);
-    
-    // Check current password
+
+    if (user.email === FAILSAFE_EMAIL) {
+      return res.status(403).json({ message: 'Cannot change failsafe admin password' });
+    }
+
     const isMatch = user.comparePassword(currentPassword);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
-    // Update password
     user.password = newPassword;
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    res.json({ success: true, message: 'Password changed successfully' });
   } catch (error) {
     console.error('Change password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
-});
-
-// @route   POST /api/auth/logout
-// @desc    Logout user (client-side token removal)
-// @access  Private
-router.post('/logout', auth, (req, res) => {
-  res.json({ message: 'Logged out successfully' });
 });
 
 module.exports = router;
