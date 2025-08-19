@@ -1,40 +1,32 @@
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const path = require('path');
-const fs = require('fs');
 
-const createUploadDirectories = () => {
-  const dirs = ['uploads/avatars', 'uploads/products'];
-  dirs.forEach(dir => {
-    const dirPath = path.join(__dirname, '..', dir);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-  });
-};
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-createUploadDirectories();
+// Create Cloudinary storage for avatars
+const avatarStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'iwiz-inventory/avatars',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 300, height: 300, crop: 'fill' }]
+  }
+});
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'uploads/';
-    
-    if (file.fieldname === 'avatar') {
-      uploadPath += 'avatars/';
-    } else if (file.fieldname === 'images') {
-      uploadPath += 'products/';
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, extension)
-      .replace(/[^a-zA-Z0-9]/g, '_')
-      .substring(0, 20);
-    
-    const filename = baseName + '-' + uniqueSuffix + extension;
-    cb(null, filename);
+// Create Cloudinary storage for product images
+const productStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'iwiz-inventory/products',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 800, height: 600, crop: 'limit' }]
   }
 });
 
@@ -48,17 +40,26 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  storage: storage,
+// Create multer instances for different upload types
+const avatarUpload = multer({
+  storage: avatarStorage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024
+    fileSize: 10 * 1024 * 1024 // 10MB
+  }
+});
+
+const productUpload = multer({
+  storage: productStorage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB
   }
 });
 
 const uploadConfigs = {
-  avatar: upload.single('avatar'),
-  productImages: upload.array('images', 5)
+  avatar: avatarUpload.single('avatar'),
+  productImages: productUpload.array('images', 5)
 };
 
 const handleMulterError = (error, req, res, next) => {
@@ -85,22 +86,47 @@ const handleMulterError = (error, req, res, next) => {
 const getFileUrl = (filename, type = 'product') => {
   if (!filename) return null;
   
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://ims-iwiz-solutions.onrender.com'
-    : 'http://localhost:5000';
+  // If filename is already a Cloudinary URL, return it as is
+  if (filename.startsWith('http')) {
+    return filename;
+  }
   
-  const uploadPath = type === 'avatar' ? 'avatars' : 'products';
-  return `${baseUrl}/uploads/${uploadPath}/${filename}`;
+  // For backward compatibility with old local filenames
+  // Return a placeholder or default image
+  return 'https://via.placeholder.com/300x300?text=Image+Not+Found';
 };
 
 const validateFileExists = (filePath) => {
-  return fs.existsSync(filePath);
+  // For Cloudinary, we assume the file exists if it's a valid URL
+  if (filePath && filePath.startsWith('http')) {
+    return true;
+  }
+  return false;
+};
+
+// Function to delete file from Cloudinary
+const deleteFile = async (publicId) => {
+  try {
+    if (publicId && publicId.startsWith('http')) {
+      // Extract public ID from URL
+      const urlParts = publicId.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      const folder = urlParts[urlParts.length - 2];
+      const publicIdToDelete = `iwiz-inventory/${folder}/${filename.split('.')[0]}`;
+      
+      await cloudinary.uploader.destroy(publicIdToDelete);
+    }
+  } catch (error) {
+    console.error('Error deleting file from Cloudinary:', error);
+  }
 };
 
 module.exports = {
-  upload,
+  upload: multer,
   uploadConfigs,
   handleMulterError,
   getFileUrl,
-  validateFileExists
+  validateFileExists,
+  deleteFile,
+  cloudinary
 };
