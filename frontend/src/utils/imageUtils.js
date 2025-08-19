@@ -19,20 +19,29 @@ const getImageUrl = (image, type = 'product') => {
     return null;
   }
 
-  const baseUrl = getBackendBaseUrl();
-
+  // If image is an object with a url property
   if (typeof image === 'object' && image.url) {
     const url = image.url;
+    // If it's already a full URL (Cloudinary), return it as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // For backward compatibility with old local file paths
+    const baseUrl = getBackendBaseUrl();
     if (url.startsWith('/uploads/')) {
       return `${baseUrl}${url}`;
     }
     return `${baseUrl}/uploads/${type === 'avatar' ? 'avatars' : 'products'}/${url}`;
   }
 
+  // If image is a string
   if (typeof image === 'string') {
+    // If it's already a full URL (Cloudinary), return it as is
     if (image.startsWith('http://') || image.startsWith('https://')) {
       return image;
     }
+    // For backward compatibility with old local file paths
+    const baseUrl = getBackendBaseUrl();
     if (image.startsWith('/uploads/')) {
       return `${baseUrl}${image}`;
     }

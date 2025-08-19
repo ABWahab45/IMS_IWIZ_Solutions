@@ -5,6 +5,15 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+// Debug environment variables
+console.log('Environment check:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Set' : 'Not Set');
+console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME);
+console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not Set');
+console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not Set');
+
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -84,6 +93,20 @@ app.get('/api/cors-test', (req, res) => {
   res.json({
     message: 'CORS is working!',
     origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Configuration test endpoint
+app.get('/api/config-test', (req, res) => {
+  res.json({
+    environment: process.env.NODE_ENV,
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'Not Set',
+      apiKey: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not Set',
+      apiSecret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not Set'
+    },
+    mongodb: process.env.MONGODB_URI ? 'Set' : 'Not Set',
     timestamp: new Date().toISOString()
   });
 });

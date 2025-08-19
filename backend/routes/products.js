@@ -156,11 +156,18 @@ router.post('/', auth, uploadLimiter, uploadConfigs.productImages, handleMulterE
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
+      console.log('Uploaded files:', req.files);
+      console.log('First file object:', req.files[0]);
+      console.log('File path:', req.files[0].path);
+      console.log('File filename:', req.files[0].filename);
+      
       productData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
         alt: req.body.name,
         isPrimary: index === 0
       }));
+      
+      console.log('Processed images:', productData.images);
     }
 
     const product = new Product(productData);
@@ -239,11 +246,17 @@ router.put('/:id', auth, uploadConfigs.productImages, handleMulterError, validat
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
+      console.log('Update - Uploaded files:', req.files);
+      console.log('Update - First file object:', req.files[0]);
+      console.log('Update - File path:', req.files[0].path);
+      
       updateData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
         alt: req.body.name,
         isPrimary: index === 0
       }));
+      
+      console.log('Update - Processed images:', updateData.images);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
