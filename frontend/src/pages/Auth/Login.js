@@ -55,18 +55,18 @@ const Login = () => {
             <div className="card shadow-lg border-0">
               <div className="card-body p-5">
                 <div className="text-center mb-4">
-                  <div className="mb-3">
+                  <div className="mb-2">
                     <img 
                       src="/iwizlogo.png" 
                       alt="IWIZ Solutions" 
                       style={{ 
-                        height: '60px', 
+                        height: '120px', 
                         width: 'auto',
-                        marginBottom: '1rem'
+                        marginBottom: '0.5rem'
                       }} 
                     />
                   </div>
-                  <p className="text-muted">Inventory Management System</p>
+                  <p className="text-muted mb-0">Inventory Management System</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>

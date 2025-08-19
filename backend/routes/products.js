@@ -141,20 +141,9 @@ router.post('/', auth, uploadLimiter, upload.array('productImages', 5), validate
         unit: req.body.unit || 'pcs',
         location: req.body.location || ''
       },
-      dimensions: {
-        length: parseFloat(req.body.length) || 0,
-        width: parseFloat(req.body.width) || 0,
-        height: parseFloat(req.body.height) || 0,
-        weight: parseFloat(req.body.weight) || 0
-      },
       tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
       status: req.body.status || 'active',
       expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : null,
-      supplier: {
-        name: req.body.supplierName || '',
-        contact: req.body.supplierContact || '',
-        email: req.body.supplierEmail || ''
-      },
       createdBy: req.user.id
     };
 
@@ -243,20 +232,9 @@ router.put('/:id', auth, upload.array('productImages', 5), validateProduct, asyn
         unit: req.body.unit || product.stock.unit,
         location: req.body.location || product.stock.location
       },
-      dimensions: {
-        length: parseFloat(req.body.length) || product.dimensions.length,
-        width: parseFloat(req.body.width) || product.dimensions.width,
-        height: parseFloat(req.body.height) || product.dimensions.height,
-        weight: parseFloat(req.body.weight) || product.dimensions.weight
-      },
       tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : product.tags,
       status: req.body.status || product.status,
-      expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : product.expiryDate,
-      supplier: {
-        name: req.body.supplierName || product.supplier.name,
-        contact: req.body.supplierContact || product.supplier.contact,
-        email: req.body.supplierEmail || product.supplier.email
-      }
+      expiryDate: req.body.expiryDate ? new Date(req.body.expiryDate) : product.expiryDate
     };
 
     // Handle image upload

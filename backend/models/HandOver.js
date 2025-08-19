@@ -57,6 +57,20 @@ const handOverSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [500, 'Return notes cannot exceed 500 characters']
+  },
+  rejectedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  rejectionReason: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Rejection reason cannot exceed 500 characters']
+  },
+  approvalNotes: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Approval notes cannot exceed 500 characters']
   }
 }, {
   timestamps: true

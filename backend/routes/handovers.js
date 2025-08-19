@@ -45,6 +45,8 @@ router.get('/', auth, checkPermission('canViewProducts'), async (req, res) => {
   }
 });
 
+
+
 // @route   POST /api/handovers
 // @desc    Create new handover (direct handover by admin/manager - no approval needed)
 // @access  Private
@@ -407,6 +409,7 @@ router.post('/:id/approve', auth, checkPermission('canManageProducts'), [
     handover.status = 'handed_over';
     handover.handedOverBy = req.user.id;
     handover.handOverDate = new Date();
+    handover.approvalNotes = approvalNotes;
     handover.notes = `${handover.notes}\nApproved by ${req.user.firstName} ${req.user.lastName}: ${approvalNotes || 'No notes'}`;
     await handover.save();
 
@@ -458,6 +461,8 @@ router.post('/:id/reject', auth, checkPermission('canManageProducts'), [
 
     // Update handover status
     handover.status = 'rejected';
+    handover.rejectedBy = req.user.id;
+    handover.rejectionReason = rejectionReason;
     handover.notes = `${handover.notes}\nRejected by ${req.user.firstName} ${req.user.lastName}: ${rejectionReason}`;
     await handover.save();
 
@@ -506,6 +511,29 @@ router.delete('/:id', auth, checkPermission('canManageProducts'), async (req, re
     });
   } catch (error) {
     console.error('Delete handover error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/handovers/:id
+// @desc    Get single handover by ID
+// @access  Private
+router.get('/:id', auth, checkPermission('canViewProducts'), async (req, res) => {
+  try {
+    const handover = await HandOver.findById(req.params.id)
+      .populate('product', 'name productId category price stock')
+      .populate('employee', 'firstName lastName email role department')
+      .populate('handedOverBy', 'firstName lastName email role')
+      .populate('returnedBy', 'firstName lastName email role')
+      .populate('rejectedBy', 'firstName lastName email role');
+
+    if (!handover) {
+      return res.status(404).json({ message: 'Handover not found' });
+    }
+
+    res.json(handover);
+  } catch (error) {
+    console.error('Get handover by ID error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import { getProductImageUrl } from '../../utils/imageUtils';
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({
@@ -322,7 +323,7 @@ const ProductForm = () => {
                       {existingImages.map((image, index) => (
                         <img
                           key={index}
-                          src={`/uploads/products/${image}`}
+                          src={getProductImageUrl(image)}
                           alt={`Product ${index + 1}`}
                           className="img-thumbnail"
                           style={{ width: '100px', height: '100px', objectFit: 'cover' }}

@@ -151,13 +151,13 @@ router.post('/login', [
 
     // Check password
     console.log('About to compare password...');
-    const isMatch = await user.comparePassword(password);
+    const isMatch = user.comparePassword(password);
     console.log('Password match result:', isMatch);
     
     if (!isMatch) {
       console.log('Password does not match');
-      console.log('Stored password hash:', user.password);
-      console.log('Attempted password length:', password.length);
+      console.log('Stored password:', user.password);
+      console.log('Attempted password:', password);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -338,7 +338,7 @@ router.post('/debug-password', async (req, res) => {
       });
     }
     
-    const isMatch = await user.comparePassword(password);
+    const isMatch = user.comparePassword(password);
     
     res.json({
       userFound: true,
@@ -346,7 +346,7 @@ router.post('/debug-password', async (req, res) => {
       userEmail: user.email,
       foundWithVariation: foundWithVariation,
       passwordMatch: isMatch,
-      passwordHash: user.password.substring(0, 30) + '...',
+      storedPassword: user.password,
       createdAt: user.createdAt,
       testedVariations: emailVariations
     });
@@ -448,7 +448,7 @@ router.put('/change-password', auth, [
     const user = await User.findById(req.user.id);
     
     // Check current password
-    const isMatch = await user.comparePassword(currentPassword);
+    const isMatch = user.comparePassword(currentPassword);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }

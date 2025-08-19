@@ -156,16 +156,13 @@ const HandOver = () => {
                           </td>
                           <td>
                             <div className="btn-group btn-group-sm">
-                              <button
+                              <Link
+                                 to={`/inventory/handover/${handover._id}`}
                                  className="btn btn-outline-primary"
-                                 onClick={() => {
-                                   // TODO: Implement view functionality
-                                   console.log('View handover:', handover);
-                                 }}
                                  title="View Details"
                                >
                                  <i className="fas fa-eye"></i>
-                               </button>
+                               </Link>
                                <button
                                  className="btn btn-outline-danger"
                                  onClick={() => {

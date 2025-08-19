@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -69,27 +68,7 @@ userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    console.log('=== PASSWORD HASHING ===');
-    console.log('Original password length:', this.password.length);
-    console.log('Password being hashed:', this.password);
-    
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    
-    console.log('Password hashed successfully');
-    console.log('Hashed password:', this.password.substring(0, 30) + '...');
-    
-    next();
-  } catch (error) {
-    console.error('Password hashing error:', error);
-    next(error);
-  }
-});
+// No password hashing - store passwords as plain text
 
 // Set permissions based on role
 userSchema.pre('save', function(next) {
@@ -142,17 +121,14 @@ userSchema.pre('save', function(next) {
   next();
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+// Compare password method (plain text comparison)
+userSchema.methods.comparePassword = function(candidatePassword) {
   console.log('=== PASSWORD COMPARISON ===');
   console.log('Candidate password:', candidatePassword);
-  console.log('Candidate password length:', candidatePassword.length);
-  console.log('Stored hash:', this.password.substring(0, 30) + '...');
+  console.log('Stored password:', this.password);
+  console.log('Direct comparison:', candidatePassword === this.password);
   
-  const result = await bcrypt.compare(candidatePassword, this.password);
-  console.log('Comparison result:', result);
-  
-  return result;
+  return candidatePassword === this.password;
 };
 
 // Get full name

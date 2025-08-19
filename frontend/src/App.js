@@ -27,6 +27,7 @@ import InventoryUsage from './pages/Inventory/InventoryUsage';
 import InventoryRestock from './pages/Inventory/InventoryRestock';
 import HandOver from './pages/Inventory/HandOver';
 import NewHandOver from './pages/Inventory/NewHandOver';
+import HandoverDetail from './pages/Inventory/HandoverDetail';
 import RequestHandover from './pages/Inventory/RequestHandover';
 import ReturnHandover from './pages/Inventory/ReturnHandover';
 import PendingHandovers from './pages/Inventory/PendingHandovers';
@@ -98,11 +99,12 @@ function AppLayout() {
             <Route path="/inventory/:id/edit" element={<AddInventory />} />
             <Route path="/inventory/usage" element={<InventoryUsage />} />
             <Route path="/inventory/restock" element={<InventoryRestock />} />
-            <Route path="/inventory/handover" element={<HandOver />} />
+                        <Route path="/inventory/handover" element={<HandOver />} />
             <Route path="/inventory/handover/new" element={<NewHandOver />} />
-                    <Route path="/inventory/request-handover" element={<RequestHandover />} />
-        <Route path="/inventory/return-handover" element={<ReturnHandover />} />
-        <Route path="/inventory/pending-handovers" element={<PendingHandovers />} />
+            <Route path="/inventory/handover/:id" element={<HandoverDetail />} />
+            <Route path="/inventory/request-handover" element={<RequestHandover />} />
+            <Route path="/inventory/return-handover" element={<ReturnHandover />} />
+            <Route path="/inventory/pending-handovers" element={<PendingHandovers />} />
             
             <Route path="/users" element={<Users />} />
             <Route path="/users/new" element={<UserForm />} />

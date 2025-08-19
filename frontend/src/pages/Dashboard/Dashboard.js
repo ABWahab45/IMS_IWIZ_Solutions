@@ -10,7 +10,11 @@ const Dashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activityLoading, setActivityLoading] = useState(true);
-  const { user, hasPermission } = useAuth();
+  const { user, hasPermission, isAdmin } = useAuth();
+
+  const isManagerOrAbove = () => {
+    return user?.role === 'admin' || user?.role === 'manager';
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -279,7 +283,7 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {hasPermission('canReturnHandover') && (
+                {hasPermission('canReturnHandover') && !isAdmin() && !isManagerOrAbove() && (
                   <div className="col-6">
                     <Link to="/inventory/return-handover" className="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
                       <i className="fas fa-undo fa-2x mb-2"></i>

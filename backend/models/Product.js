@@ -11,7 +11,8 @@ const productSchema = new mongoose.Schema({
   productId: {
     type: Number,
     unique: true,
-    required: false // Changed to false since it's auto-generated
+    required: false,
+    sparse: true // Allow multiple null values
   },
   name: {
     type: String,
@@ -72,12 +73,6 @@ const productSchema = new mongoose.Schema({
       default: Date.now
     }
   },
-  dimensions: {
-    length: { type: Number, min: 0 },
-    width: { type: Number, min: 0 },
-    height: { type: Number, min: 0 },
-    weight: { type: Number, min: 0 }
-  },
   images: [{
     url: String,
     alt: String,
@@ -90,11 +85,6 @@ const productSchema = new mongoose.Schema({
     default: 'active'
   },
   expiryDate: Date,
-  supplier: {
-    name: String,
-    contact: String,
-    email: String
-  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -110,7 +100,7 @@ const productSchema = new mongoose.Schema({
 
 // Auto-increment function
 productSchema.pre('save', async function(next) {
-  if (this.isNew) {
+  if (this.isNew && !this.productId) {
     try {
       const counter = await Counter.findByIdAndUpdate(
         'productId',
@@ -119,7 +109,9 @@ productSchema.pre('save', async function(next) {
       );
       this.productId = counter.seq;
     } catch (error) {
-      return next(error);
+      console.error('Error generating product ID:', error);
+      // If counter fails, use timestamp as fallback
+      this.productId = Date.now();
     }
   }
   

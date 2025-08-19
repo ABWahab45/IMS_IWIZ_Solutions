@@ -13,6 +13,10 @@ const Sidebar = () => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
+  const isManagerOrAbove = () => {
+    return user?.role === 'admin' || user?.role === 'manager';
+  };
+
   const menuItems = [
     {
       path: '/dashboard',
@@ -48,7 +52,7 @@ const Sidebar = () => {
       path: '/inventory/return-handover',
       icon: 'fas fa-undo',
       label: 'My Handovers',
-      show: hasPermission('canReturnHandover')
+      show: hasPermission('canReturnHandover') && !isAdmin() && !isManagerOrAbove()
     },
     {
       path: '/reports',
@@ -75,27 +79,32 @@ const Sidebar = () => {
       {/* Mobile overlay */}
       <div className="sidebar-overlay d-md-none" onClick={toggleSidebar}></div>
       <div className="sidebar-brand">
-        <div className="d-flex align-items-center justify-content-between">
-                      {!collapsed && (
-              <div>
-                <img 
-                  src="/iwizlogo.png" 
-                  alt="IWIZ Solutions" 
-                  style={{ 
-                    height: '40px', 
-                    width: 'auto',
-                    filter: 'brightness(0) invert(1)' // Makes the logo white for sidebar
-                  }} 
-                />
-              </div>
-            )}
-          <button
-            className="btn btn-link text-white p-0"
-            onClick={toggleSidebar}
-            title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            <i className={`fas ${collapsed ? 'fa-chevron-right' : 'fa-chevron-left'}`}></i>
-          </button>
+        <div className="d-flex align-items-center justify-content-center">
+          {!collapsed ? (
+            <div className="d-flex justify-content-center">
+              <img 
+                src="/iwizlogo.png" 
+                alt="IWIZ Solutions" 
+                style={{ 
+                  height: '120px', 
+                  width: 'auto',
+                  // filter: 'brightness(0) invert(1)' // Makes the logo white for sidebar
+                }} 
+              />
+            </div>
+          ) : (
+            <div className="d-flex justify-content-center">
+              <img 
+                src="/iwizlogo.png" 
+                alt="IWIZ Solutions" 
+                style={{ 
+                  height: '40px', 
+                  width: 'auto',
+                  // filter: 'brightness(0) invert(1)' // Makes the logo white for collapsed sidebar
+                }} 
+              />
+            </div>
+          )}
         </div>
       </div>
 

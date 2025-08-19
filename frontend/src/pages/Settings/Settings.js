@@ -5,7 +5,7 @@ const Settings = () => {
   const [settings, setSettings] = useState({
     companyName: 'IWIZ Solutions',
     companyEmail: 'admin@iwiz.com',
-    companyPhone: '+92 3357366900',
+    companyPhone: '+92 3xx-xxxxxxx',
     companyAddress: 'Third Floor, Amjad plaza, Bank Rd, Saddar, Rawalpindi, Punjab 46000',
     currency: 'PKR'
   });
@@ -96,9 +96,6 @@ const Settings = () => {
                       onChange={(e) => handleSettingChange('currency', e.target.value)}
                     >
                       <option value="PKR">PKR - Pakistani Rupee</option>
-                      <option value="USD">USD - US Dollar</option>
-                      <option value="EUR">EUR - Euro</option>
-                      <option value="GBP">GBP - British Pound</option>
                     </select>
                   </div>
                 </div>
@@ -115,10 +112,6 @@ const Settings = () => {
                 />
               </div>
               
-              <div className="alert alert-info">
-                <i className="fas fa-info-circle me-2"></i>
-                <strong>Note:</strong> These settings will be used throughout the application for company information display.
-              </div>
             </div>
           </div>
         </div>
