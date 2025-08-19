@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
@@ -16,11 +16,7 @@ const Dashboard = () => {
     return user?.role === 'admin' || user?.role === 'manager';
   };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setActivityLoading(true);
       const [statsResponse, activityResponse] = await Promise.all([
@@ -30,7 +26,6 @@ const Dashboard = () => {
       
       setDashboardData(statsResponse.data);
       
-      // Filter out user activities for managers (only admins can see user activities)
       const activities = activityResponse.data.activities || [];
       const filteredActivities = activities.filter(activity => {
         if (activity.type === 'user' && !hasPermission('canManageUsers')) {
@@ -47,7 +42,13 @@ const Dashboard = () => {
       setLoading(false);
       setActivityLoading(false);
     }
-  };
+  }, [hasPermission]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+
 
 
 
