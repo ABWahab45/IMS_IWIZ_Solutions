@@ -59,7 +59,7 @@ const productUpload = multer({
 
 const uploadConfigs = {
   avatar: avatarUpload.single('avatar'),
-  productImages: productUpload.array('images', 5)
+  productImages: productUpload.array('productImages', 5)
 };
 
 const handleMulterError = (error, req, res, next) => {
