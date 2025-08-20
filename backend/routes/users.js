@@ -213,8 +213,31 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
 
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
-    if (role) user.role = role;
     if (phone) user.phone = phone;
+    
+    // If role is being changed, update permissions to match the new role
+    if (role && role !== user.role) {
+      console.log(`Updating user ${user.email} role from ${user.role} to ${role}`);
+      user.role = role;
+      
+      // Update permissions based on the new role
+      user.permissions = {
+        canViewProducts: true,
+        canAddProducts: role === 'admin' || role === 'manager',
+        canEditProducts: role === 'admin' || role === 'manager',
+        canDeleteProducts: role === 'admin',
+        canManageProducts: role === 'admin' || role === 'manager',
+        canViewOrders: true,
+        canManageOrders: role === 'admin' || role === 'manager',
+        canManageUsers: role === 'admin',
+        canRequestHandover: role === 'employee',
+        canReturnHandover: role === 'employee',
+      };
+      
+      console.log(`Updated permissions for ${user.email}:`, user.permissions);
+    } else if (role) {
+      user.role = role;
+    }
 
     if (req.file) {
       console.log('Update User - Uploaded file:', req.file);
@@ -240,6 +263,47 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
     });
   } catch (error) {
     console.error('Update user error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Endpoint to fix specific user permissions
+router.post('/fix-permissions/:email', auth, checkRole('admin'), async (req, res) => {
+  try {
+    const { email } = req.params;
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update permissions based on current role
+    user.permissions = {
+      canViewProducts: true,
+      canAddProducts: user.role === 'admin' || user.role === 'manager',
+      canEditProducts: user.role === 'admin' || user.role === 'manager',
+      canDeleteProducts: user.role === 'admin',
+      canManageProducts: user.role === 'admin' || user.role === 'manager',
+      canViewOrders: true,
+      canManageOrders: user.role === 'admin' || user.role === 'manager',
+      canManageUsers: user.role === 'admin',
+      canRequestHandover: user.role === 'employee',
+      canReturnHandover: user.role === 'employee',
+    };
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: `Permissions fixed for ${email}`,
+      user: {
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions
+      }
+    });
+  } catch (error) {
+    console.error('Fix permissions error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

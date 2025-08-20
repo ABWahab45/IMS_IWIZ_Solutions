@@ -132,6 +132,20 @@ userSchema.pre('save', function(next) {
       canRequestHandover: false,
       canReturnHandover: false,
     };
+  } else {
+    // Auto-sync permissions with role for all other users
+    this.permissions = {
+      canViewProducts: true,
+      canAddProducts: this.role === 'admin' || this.role === 'manager',
+      canEditProducts: this.role === 'admin' || this.role === 'manager',
+      canDeleteProducts: this.role === 'admin',
+      canManageProducts: this.role === 'admin' || this.role === 'manager',
+      canViewOrders: true,
+      canManageOrders: this.role === 'admin' || this.role === 'manager',
+      canManageUsers: this.role === 'admin',
+      canRequestHandover: this.role === 'employee',
+      canReturnHandover: this.role === 'employee',
+    };
   }
   next();
 });
