@@ -23,12 +23,12 @@ const Navbar = () => {
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           <button
-            className="btn btn-link text-dark d-md-none me-3"
+            className="btn btn-link text-dark me-3"
             onClick={toggleSidebar}
           >
             <i className="fas fa-bars"></i>
           </button>
-          <h4 className="mb-0">IWIZ Solutions</h4>
+          <h4 className="mb-0">Inventory Management System</h4>
         </div>
 
         <div className="d-flex align-items-center">

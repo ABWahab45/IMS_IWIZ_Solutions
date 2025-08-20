@@ -230,6 +230,7 @@ const Profile = () => {
                     <input
                       type="file"
                       id="avatar"
+                      name="avatar"
                       className="form-control"
                       accept="image/*"
                       onChange={handleAvatarChange}
