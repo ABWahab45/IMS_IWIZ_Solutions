@@ -15,11 +15,19 @@ app.use(cors({
       'https://iwiz-inventory-git-main.vercel.app',
       'https://ims-iwiz-solutions.vercel.app',
       'https://ims-iwiz-solutions-git-main.vercel.app',
+      'https://ims-iwiz-solutions-abwahabs-projects.vercel.app',
+      'https://ims-iwiz-solutions-git-main-abwahabs-projects.vercel.app',
       'http://localhost:3000',
       'http://localhost:3001',
       'http://192.168.1.10:3000',
       'http://192.168.1.10:3001'
     ];
+    
+    // Allow all Vercel domains (temporary fix)
+    if (origin.includes('vercel.app')) {
+      console.log('✅ Allowing Vercel domain:', origin);
+      return callback(null, true);
+    }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -142,4 +150,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🧪 Test from Vercel with these environment variables:`);
   console.log(`   REACT_APP_API_URL=http://192.168.1.10:${PORT}/api`);
   console.log(`   REACT_APP_BACKEND_URL=http://192.168.1.10:${PORT}`);
+  console.log(`\n🔧 CORS: All Vercel domains are now allowed!`);
 });

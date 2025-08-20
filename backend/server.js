@@ -31,10 +31,12 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
       'https://iwiz-inventory-git-main.vercel.app',
       'https://ims-iwiz-solutions.vercel.app',
       'https://ims-iwiz-solutions-git-main.vercel.app',
+      'https://ims-iwiz-solutions-abwahabs-projects.vercel.app',
+      'https://ims-iwiz-solutions-git-main-abwahabs-projects.vercel.app',
       'https://iwiz-inventory.vercel.app',
       'https://iwiz-inventory-git-main.vercel.app'
     ]
-  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://192.168.1.10:3000', 'http://192.168.1.10:3001'];
 
 app.use(cors({
   origin: function (origin, callback) {
