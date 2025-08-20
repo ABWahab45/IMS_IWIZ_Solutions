@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSidebar } from '../../contexts/SidebarContext';
+import { toast } from 'react-toastify';
 import ThemeToggle from '../Common/ThemeToggle';
 import ImageWithFallback from '../Common/ImageWithFallback';
 
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = () => {
+    toast.success('Logged out successfully');
     logout();
     setShowUserMenu(false);
   };

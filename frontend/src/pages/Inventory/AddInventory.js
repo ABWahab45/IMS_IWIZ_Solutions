@@ -61,10 +61,19 @@ const ProductForm = () => {
   }, [id, isEdit, navigate]);
 
   useEffect(() => {
-    if (!hasPermission('canViewProducts')) {
-      toast.error('You do not have permission to access this page');
-      navigate('/inventory');
-      return;
+    // Check permissions based on whether this is create or edit mode
+    if (isEdit) {
+      if (!hasPermission('canEditProducts')) {
+        toast.error('You do not have permission to edit products');
+        navigate('/inventory');
+        return;
+      }
+    } else {
+      if (!hasPermission('canAddProducts')) {
+        toast.error('You do not have permission to create products');
+        navigate('/inventory');
+        return;
+      }
     }
     
     fetchData();
@@ -83,6 +92,20 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Double-check permissions before submission
+    if (isEdit) {
+      if (!hasPermission('canEditProducts')) {
+        toast.error('You do not have permission to edit products');
+        return;
+      }
+    } else {
+      if (!hasPermission('canAddProducts')) {
+        toast.error('You do not have permission to create products');
+        return;
+      }
+    }
+    
     setIsSubmitting(true);
     
     try {

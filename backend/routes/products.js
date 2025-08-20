@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
-const { auth } = require('../middleware/auth');
+const { auth, checkPermission, managerAndAbove } = require('../middleware/auth');
 const { uploadConfigs, handleMulterError } = require('../middleware/upload');
 const { body, validationResult } = require('express-validator');
 const { validateProduct } = require('../middleware/validation');
@@ -108,7 +108,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products - Create new product
-router.post('/', auth, uploadLimiter, uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
+router.post('/', auth, checkPermission('canAddProducts'), uploadLimiter, uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -207,7 +207,7 @@ router.post('/', auth, uploadLimiter, uploadConfigs.productImages, handleMulterE
 });
 
 // PUT /api/products/:id - Update product
-router.put('/:id', auth, uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
+router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.productImages, handleMulterError, validateProduct, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -291,7 +291,7 @@ router.put('/:id', auth, uploadConfigs.productImages, handleMulterError, validat
 });
 
 // DELETE /api/products/:id - Delete product
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, checkPermission('canDeleteProducts'), async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
@@ -308,7 +308,7 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // PUT /api/products/:id/stock - Update stock
-router.put('/:id/stock', auth, async (req, res) => {
+router.put('/:id/stock', auth, checkPermission('canManageProducts'), async (req, res) => {
   try {
     const { operation, quantity } = req.body;
     

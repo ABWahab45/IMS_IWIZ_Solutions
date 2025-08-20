@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 
 const Login = () => {
@@ -13,15 +14,12 @@ const Login = () => {
   
   const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const from = location.state?.from?.pathname || '/dashboard';
 
   useEffect(() => {
     if (isAuthenticated && !loading) {
-      navigate(from, { replace: true });
+      navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, loading, navigate, from]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -45,10 +43,13 @@ const Login = () => {
     console.log('Login result:', result);
     
     if (result.success) {
-      navigate(from, { replace: true });
+      toast.success('Login successful! Redirecting to dashboard...');
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 1000);
     } else {
       // Show error message to user
-      alert(`Login failed: ${result.message}`);
+      toast.error(`Login failed: ${result.message}`);
     }
     
     setIsSubmitting(false);
