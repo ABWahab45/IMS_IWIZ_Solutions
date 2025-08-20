@@ -76,11 +76,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-
+      console.log('AuthContext: Attempting login with email:', email);
+      console.log('AuthContext: API base URL:', api.defaults.baseURL);
       
       const response = await api.post('/auth/login', { email, password });
       
-
+      console.log('AuthContext: Login response received:', response.data);
       
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
@@ -97,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('AuthContext: Login error:', error);
+      console.error('AuthContext: Error response:', error.response?.data);
       const message = error.response?.data?.message || 'Login failed';
       return { success: false, message };
     }

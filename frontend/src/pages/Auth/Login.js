@@ -32,11 +32,15 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-
+    console.log('Login attempt:', {
+      email: formData.email,
+      apiUrl: process.env.REACT_APP_API_URL || 'Not set',
+      currentOrigin: window.location.origin
+    });
     
     const result = await login(formData.email, formData.password);
     
-
+    console.log('Login result:', result);
     
     if (result.success) {
       toast.success('Login successful! Redirecting to dashboard...');
