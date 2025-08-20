@@ -5,6 +5,9 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+// Import upload configurations
+const { uploadConfigs, handleMulterError } = require('./middleware/upload');
+
 // Debug environment variables
 console.log('Environment check:');
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -58,20 +61,35 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Handle preflight requests
 app.options('*', cors());
 
+// Connect to MongoDB with timeout and retry
+console.log('Attempting to connect to MongoDB...');
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not Set');
+
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+  socketTimeoutMS: 45000, // 45 seconds timeout
+  connectTimeoutMS: 10000 // 10 seconds timeout
 });
 
 const db = mongoose.connection;
 
 db.on('error', (err) => {
   console.error('MongoDB connection error:', err);
-  process.exit(1);
+  console.error('Error details:', err.message);
+});
+
+db.on('connected', () => {
+  console.log('MongoDB connected successfully');
+});
+
+db.on('disconnected', () => {
+  console.log('MongoDB disconnected');
 });
 
 db.once('open', () => {
-  console.log('MongoDB connected successfully');
+  console.log('MongoDB connection opened');
 });
 
 if (NODE_ENV === 'development') {
@@ -159,9 +177,44 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
+// Add startup timeout to prevent infinite hanging
+const startupTimeout = setTimeout(() => {
+  console.error('Startup timeout reached. Server failed to start within 30 seconds.');
+  process.exit(1);
+}, 30000);
+
 const server = app.listen(PORT, () => {
+  clearTimeout(startupTimeout);
   console.log(`Server running on port ${PORT}`);
   console.log('IWIZ Solutions Inventory Management System');
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('MongoDB URI set:', !!process.env.MONGODB_URI);
+  console.log('Cloudinary configured:', !!process.env.CLOUDINARY_CLOUD_NAME);
+});
+
+// Add error handling for server
+server.on('error', (error) => {
+  console.error('Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error('Port is already in use');
+  }
+});
+
+// Add graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
 });
 
 process.on('SIGTERM', () => {
