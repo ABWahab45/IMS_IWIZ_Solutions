@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Environment Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Vercel Environment Debug</h1>
+        
+        <div class="status info">
+            <h3>Environment Variables</h3>
+            <p><strong>REACT_APP_API_URL:</strong> <span id="apiUrl">Loading...</span></p>
+            <p><strong>REACT_APP_BACKEND_URL:</strong> <span id="backendUrl">Loading...</span></p>
+        </div>
+
+        <div class="status info">
+            <h3>Current Page Info</h3>
+            <p><strong>Current URL:</strong> <span id="currentUrl">Loading...</span></p>
+            <p><strong>Hostname:</strong> <span id="hostname">Loading...</span></p>
+        </div>
+
+        <div class="status info">
+            <h3>Test Connections</h3>
+            <button onclick="testLocalBackend()">Test Local Backend (localhost:8080)</button>
+            <button onclick="testNgrokBackend()">Test ngrok Backend</button>
+            <button onclick="testRenderBackend()">Test Render Backend</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Display environment variables
+        document.getElementById('apiUrl').textContent = process.env.REACT_APP_API_URL || 'Not set';
+        document.getElementById('backendUrl').textContent = process.env.REACT_APP_BACKEND_URL || 'Not set';
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('hostname').textContent = window.location.hostname;
+
+        async function testConnection(url, name) {
+            const resultsDiv = document.getElementById('results');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'status';
+            
+            try {
+                statusDiv.innerHTML = `<h4>Testing ${name}...</h4>`;
+                statusDiv.className = 'status info';
+                resultsDiv.appendChild(statusDiv);
+
+                const response = await fetch(`${url}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <h4>✅ ${name} - SUCCESS</h4>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Response:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                statusDiv.className = 'status success';
+                
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <h4>❌ ${name} - FAILED</h4>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+                statusDiv.className = 'status error';
+            }
+        }
+
+        function testLocalBackend() {
+            testConnection('http://localhost:8080', 'Local Backend');
+        }
+
+        function testNgrokBackend() {
+            testConnection('https://feebc6837dee.ngrok-free.app', 'ngrok Backend');
+        }
+
+        function testRenderBackend() {
+            testConnection('https://ims-iwiz-solutions.onrender.com', 'Render Backend');
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            setTimeout(() => {
+                testNgrokBackend();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
