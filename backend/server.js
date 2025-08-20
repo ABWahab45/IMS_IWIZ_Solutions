@@ -110,6 +110,7 @@ if (NODE_ENV === 'development') {
   mongoose.set('debug', true);
 }
 
+// Lightweight health check for uptime monitoring
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -118,6 +119,98 @@ app.get('/api/health', (req, res) => {
     environment: NODE_ENV,
     allowedOrigins: allowedOrigins
   });
+});
+
+// Ultra-lightweight uptime monitoring endpoint for UptimeRobot
+app.get('/api/uptime', (req, res) => {
+  // Minimal response for faster monitoring
+  res.status(200).json({
+    status: 'UP',
+    uptime: process.uptime(),
+    timestamp: Date.now()
+  });
+});
+
+// Super lightweight ping endpoint for UptimeRobot
+app.get('/api/ping', (req, res) => {
+  // Minimal response - just "pong"
+  res.status(200).send('pong');
+});
+
+// Text-based health check for simple monitoring
+app.get('/api/status', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// Comprehensive monitoring endpoint
+app.get('/api/monitor', async (req, res) => {
+  try {
+    const startTime = Date.now();
+    
+    // Check database connection
+    const dbState = mongoose.connection.readyState;
+    const isDbConnected = dbState === 1;
+    
+    // Check memory usage
+    const memUsage = process.memoryUsage();
+    
+    // Calculate response time
+    const responseTime = Date.now() - startTime;
+    
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: NODE_ENV,
+      database: {
+        status: isDbConnected ? 'connected' : 'disconnected',
+        state: dbState
+      },
+      memory: {
+        rss: Math.round(memUsage.rss / 1024 / 1024) + ' MB',
+        heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024) + ' MB',
+        heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024) + ' MB'
+      },
+      responseTime: responseTime + 'ms'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Database health check endpoint
+app.get('/api/health/db', async (req, res) => {
+  try {
+    // Quick database connectivity test
+    const dbState = mongoose.connection.readyState;
+    const isConnected = dbState === 1; // 1 = connected
+    
+    if (isConnected) {
+      res.json({
+        status: 'OK',
+        database: 'connected',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(503).json({
+        status: 'ERROR',
+        database: 'disconnected',
+        state: dbState,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      database: 'error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // CORS test endpoint
