@@ -1,0 +1,12 @@
+# ngrok HTTPS Environment Variables
+# This file is for testing with ngrok HTTPS tunnel
+
+# ngrok HTTPS URL (update this with your actual ngrok URL)
+REACT_APP_API_URL=https://233352d2f43f.ngrok-free.app/api
+REACT_APP_BACKEND_URL=https://233352d2f43f.ngrok-free.app
+
+# Instructions:
+# 1. Copy this file to frontend/.env.local
+# 2. Update the ngrok URL above with your actual ngrok URL
+# 3. Redeploy Vercel
+# 4. Test login - it should work without mixed content error!
