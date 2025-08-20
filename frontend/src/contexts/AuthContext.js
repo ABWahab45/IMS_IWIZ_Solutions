@@ -105,7 +105,9 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (formData) => {
     try {
       console.log('AuthContext: Sending profile update request');
-      const response = await api.put('/auth/profile', formData);
+      const response = await api.put('/auth/profile', formData, {
+        headers: { 'Content-Type': undefined }
+      });
       console.log('AuthContext: Profile update response:', response.data);
       
       if (response.data.success) {

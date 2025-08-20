@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import ImageWithFallback from '../../components/Common/ImageWithFallback';
+import { debugFormData } from '../../utils/debugFormData';
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
@@ -53,10 +54,7 @@ const Profile = () => {
         formData.append('avatar', avatar);
       }
       
-      console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+      debugFormData(formData, 'avatar-upload');
       
       await updateProfile(formData);
       toast.success('Profile updated successfully!');

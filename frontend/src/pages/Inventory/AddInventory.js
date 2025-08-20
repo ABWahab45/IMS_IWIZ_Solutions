@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import api from '../../services/axiosConfig';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import { getProductImageUrl } from '../../utils/imageUtils';
+import { debugFormData } from '../../utils/debugFormData';
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({
@@ -99,15 +100,17 @@ const ProductForm = () => {
         submitData.append('productImages', image);
       });
       
+      debugFormData(submitData, 'product-upload');
+      
       if (isEdit) {
         await api.put(`/products/${id}`, submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { 'Content-Type': undefined }
         });
         toast.success('Product updated successfully');
         navigate(`/inventory/${id}`);
       } else {
         const response = await api.post('/products', submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { 'Content-Type': undefined }
         });
         toast.success('Product created successfully');
         navigate('/inventory');
