@@ -34,6 +34,7 @@ const Profile = () => {
   };
 
   const handleAvatarChange = (e) => {
+    console.log('Avatar file selected:', e.target.files[0]);
     setAvatar(e.target.files[0]);
   };
 
@@ -48,13 +49,20 @@ const Profile = () => {
       formData.append('phone', profileData.phone);
       
       if (avatar) {
+        console.log('Adding avatar to formData:', avatar);
         formData.append('avatar', avatar);
+      }
+      
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
       }
       
       await updateProfile(formData);
       toast.success('Profile updated successfully!');
       setAvatar(null);
     } catch (error) {
+      console.error('Profile update error:', error);
       toast.error(error.message || 'Failed to update profile');
     } finally {
       setIsSubmitting(false);

@@ -111,6 +111,39 @@ app.get('/api/config-test', (req, res) => {
   });
 });
 
+// Avatar upload test endpoint
+app.post('/api/test-avatar-upload', uploadConfigs.avatar, handleMulterError, (req, res) => {
+  try {
+    console.log('Test avatar upload - Request received');
+    console.log('Files:', req.file);
+    console.log('Body:', req.body);
+    
+    if (req.file) {
+      res.json({
+        success: true,
+        message: 'Avatar upload test successful',
+        file: {
+          path: req.file.path,
+          filename: req.file.filename,
+          originalname: req.file.originalname
+        }
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+  } catch (error) {
+    console.error('Test avatar upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Test upload failed',
+      error: error.message
+    });
+  }
+});
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/users', require('./routes/users'));

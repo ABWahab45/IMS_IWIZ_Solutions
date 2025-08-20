@@ -23,7 +23,7 @@ const Navbar = () => {
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           <button
-            className="btn btn-link text-dark me-3"
+            className="btn btn-link me-3"
             onClick={toggleSidebar}
           >
             <i className="fas fa-bars"></i>
@@ -36,7 +36,7 @@ const Navbar = () => {
           
           <div className="dropdown ms-3">
             <button
-              className="btn btn-link text-dark d-flex align-items-center"
+              className="btn btn-link d-flex align-items-center"
               onClick={toggleUserMenu}
             >
               <ImageWithFallback
