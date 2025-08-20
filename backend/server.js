@@ -32,7 +32,9 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
       'https://ims-iwiz-solutions.vercel.app',
       'https://ims-iwiz-solutions-git-main.vercel.app',
       'https://iwiz-inventory.vercel.app',
-      'https://iwiz-inventory-git-main.vercel.app'
+      'https://iwiz-inventory-git-main.vercel.app',
+      // Add any vercel.app domain for flexibility
+      /^https:\/\/.*\.vercel\.app$/
     ]
   : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
@@ -41,10 +43,22 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Check if origin is in allowed list
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      console.log('CORS allowed origin:', origin);
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
