@@ -9,9 +9,20 @@ const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { message: 'Too many login attempts, please try again later.' }
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Increased from 5 to 20 attempts
+  message: { 
+    message: 'Too many login attempts. Please wait 15 minutes before trying again, or contact an administrator if you need immediate access.' 
+  },
+  skipSuccessfulRequests: true, // Don't count successful logins
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: 'Too many login attempts. Please wait 15 minutes before trying again, or contact an administrator if you need immediate access.',
+      retryAfter: Math.ceil(15 * 60 / 1000) // 15 minutes in seconds
+    });
+  }
 });
 
 const registerLimiter = rateLimit({
@@ -21,6 +32,18 @@ const registerLimiter = rateLimit({
 });
 
 const FAILSAFE_EMAIL = 'irtazamadadnaqvi@iwiz.com';
+
+// Endpoint to check login rate limit status
+router.get('/login-status', (req, res) => {
+  res.json({
+    message: 'Login endpoint is available',
+    rateLimit: {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      maxAttempts: 20,
+      description: '20 attempts per 15 minutes'
+    }
+  });
+});
 
 router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterError, [
   body('firstName').trim().notEmpty().withMessage('First name is required'),
@@ -98,7 +121,18 @@ router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterErro
   }
 });
 
-router.post('/login', loginLimiter, [
+// Custom middleware to bypass rate limit for failsafe admin
+const loginWithFailsafeBypass = (req, res, next) => {
+  const email = req.body.email;
+  if (email === FAILSAFE_EMAIL) {
+    // Skip rate limiting for failsafe admin
+    return next();
+  }
+  // Apply rate limiting for all other users
+  return loginLimiter(req, res, next);
+};
+
+router.post('/login', loginWithFailsafeBypass, [
   body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {

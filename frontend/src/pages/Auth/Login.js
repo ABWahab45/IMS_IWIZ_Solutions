@@ -49,7 +49,11 @@ const Login = () => {
       }, 1000);
     } else {
       // Show error message to user
-      toast.error(`Login failed: ${result.message}`);
+      if (result.message.includes('Too many login attempts')) {
+        toast.error('Too many login attempts. Please wait 15 minutes before trying again, or contact an administrator for immediate access.');
+      } else {
+        toast.error(`Login failed: ${result.message}`);
+      }
     }
     
     setIsSubmitting(false);
