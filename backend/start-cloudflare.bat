@@ -1,15 +1,16 @@
 @echo off
-echo Starting IWIZ Inventory Management System with Cloudflare Tunnel...
+echo Starting Iwiz Inventory Backend with Cloudflare Tunnel...
+echo Cloudflare URL: https://chosen-annotation-hearings-improvement.trycloudflare.com
+echo.
 
-REM Load environment variables from .env file
-for /f "tokens=1,2 delims==" %%a in (.env) do (
-    set %%a=%%b
-)
-
-REM Set production environment
+cd /d "%~dp0"
 set NODE_ENV=production
+set PORT=5000
 
-REM Start the server
-node server.js
+echo Installing dependencies...
+npm install
+
+echo Starting server...
+npm start
 
 pause
