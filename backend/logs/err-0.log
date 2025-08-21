@@ -78,3 +78,35 @@
 }
 2025-08-21T15:13:15: Port is already in use
 2025-08-21T15:13:45: Startup timeout reached. Server failed to start within 30 seconds.
+2025-08-21T15:13:46: Server error: Error: bind EADDRINUSE null:5000
+    at listenOnPrimaryHandle (node:net:2021:18)
+    at shared (node:internal/cluster/child:157:3)
+    at Worker.<anonymous> (node:internal/cluster/child:110:7)
+    at process.onInternalMessage (node:internal/cluster/utils:49:5)
+    at process.emit (node:events:530:35)
+    at emit (node:internal/child_process:949:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:91:21) {
+  errno: -4091,
+  code: 'EADDRINUSE',
+  syscall: 'bind',
+  address: null,
+  port: 5000
+}
+2025-08-21T15:13:46: Port is already in use
+2025-08-21T15:14:16: Startup timeout reached. Server failed to start within 30 seconds.
+2025-08-21T15:14:17: Server error: Error: bind EADDRINUSE null:5000
+    at listenOnPrimaryHandle (node:net:2021:18)
+    at shared (node:internal/cluster/child:157:3)
+    at Worker.<anonymous> (node:internal/cluster/child:110:7)
+    at process.onInternalMessage (node:internal/cluster/utils:49:5)
+    at process.emit (node:events:530:35)
+    at emit (node:internal/child_process:949:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:91:21) {
+  errno: -4091,
+  code: 'EADDRINUSE',
+  syscall: 'bind',
+  address: null,
+  port: 5000
+}
+2025-08-21T15:14:17: Port is already in use
+2025-08-21T15:14:47: Startup timeout reached. Server failed to start within 30 seconds.
