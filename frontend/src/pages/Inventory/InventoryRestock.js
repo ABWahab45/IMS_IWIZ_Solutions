@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import api from '../../services/axiosConfig';
+import api from '../../services/api';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 
 const InventoryRestock = () => {

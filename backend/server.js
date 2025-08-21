@@ -27,16 +27,24 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production' 
   ? [
+      // Vercel domains (existing)
       'https://iwiz-inventory.vercel.app', 
       'https://iwiz-inventory-git-main.vercel.app',
       'https://ims-iwiz-solutions.vercel.app',
       'https://ims-iwiz-solutions-git-main.vercel.app',
       'https://iwiz-inventory.vercel.app',
       'https://iwiz-inventory-git-main.vercel.app',
+      // Cloudflare tunnel domains
+      /^https:\/\/.*\.trycloudflare\.com$/,
+      /^https:\/\/.*\.cf\.tunnel\.com$/,
+      /^https:\/\/.*\.cloudflareaccess\.com$/,
       // Add any vercel.app domain for flexibility
-      /^https:\/\/.*\.vercel\.app$/
+      /^https:\/\/.*\.vercel\.app$/,
+      // Allow any localhost for development
+      /^https?:\/\/localhost:\d+$/,
+      /^https?:\/\/127\.0\.0\.1:\d+$/
     ]
-  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'];
 
 app.use(cors({
   origin: function (origin, callback) {

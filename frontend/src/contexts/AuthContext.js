@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import api from '../services/axiosConfig';
+import api from '../services/api';
 
 const AuthContext = createContext();
 

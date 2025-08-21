@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../../services/axiosConfig';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import ImageWithFallback from '../../components/Common/ImageWithFallback';

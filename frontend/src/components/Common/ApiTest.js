@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../../services/axiosConfig';
+import api from '../../services/api';
 
 const ApiTest = () => {
   const [testResults, setTestResults] = useState(null);

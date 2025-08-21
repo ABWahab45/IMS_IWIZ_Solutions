@@ -13,13 +13,3 @@ API Integration: Check the API calls to my MongoDB database for proper error han
 Performance Issues: Identify any areas where performance could be improved, such as unnecessary re-renders or large bundle sizes.
 Security Vulnerabilities: Highlight any potential security issues, especially related to user authentication and data handling.
 User Experience: Provide feedback on the overall user experience, including navigation, responsiveness, and accessibility.
-
-
-
-
-brother guide me 
-is there a way to run my website locally i have deployed it frontend on versal backend on render database on mongodb atlas and imagehandeling on cloudinary now i am given the task to deploy the backend on there server pc and the frontend on versal
-
-but first i want to test everything on my pc 
-
-guide me everthing in detail 

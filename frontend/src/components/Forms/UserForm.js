@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/axiosConfig';
+import api from '../../services/api';
 import LoadingSpinner from '../Common/LoadingSpinner';
 
 const UserForm = () => {

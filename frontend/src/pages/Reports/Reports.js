@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
-import api from '../../services/axiosConfig';
+import api from '../../services/api';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 
 const Reports = () => {
