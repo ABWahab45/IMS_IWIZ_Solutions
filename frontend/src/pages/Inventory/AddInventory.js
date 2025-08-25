@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import { getProductImageUrl } from '../../utils/imageUtils';
-import { debugFormData } from '../../utils/debugFormData';
+
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({
@@ -123,7 +123,7 @@ const ProductForm = () => {
         submitData.append('productImages', image);
       });
       
-      debugFormData(submitData, 'product-upload');
+  
       
       if (isEdit) {
         await api.put(`/products/${id}`, submitData, {

@@ -39,11 +39,6 @@ const getBaseURL = async () => {
   if (process.env.REACT_APP_BACKEND_MODE) {
     const mode = process.env.REACT_APP_BACKEND_MODE.toLowerCase();
     
-    if (mode === 'cloudflare' && process.env.REACT_APP_CLOUDFLARE_API_URL) {
-      console.log('✅ Using Cloudflare backend:', process.env.REACT_APP_CLOUDFLARE_API_URL);
-      return process.env.REACT_APP_CLOUDFLARE_API_URL;
-    }
-    
     if (mode === 'render' && process.env.REACT_APP_RENDER_API_URL) {
       console.log('✅ Using Render backend:', process.env.REACT_APP_RENDER_API_URL);
       return process.env.REACT_APP_RENDER_API_URL;
@@ -52,29 +47,16 @@ const getBaseURL = async () => {
   
   // Check if we're in production (not localhost)
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    // For production, implement smart backend selection
-    const serverPCAvailable = isServerPCAvailable();
-    console.log('🕐 Server PC availability check:', serverPCAvailable);
-    
-    // Try Cloudflare backend first if server PC should be available
-    if (serverPCAvailable && process.env.REACT_APP_CLOUDFLARE_API_URL) {
-      const cloudflareAvailable = await testBackendAvailability(process.env.REACT_APP_CLOUDFLARE_API_URL);
-      if (cloudflareAvailable) {
-        console.log('✅ Using Cloudflare backend (server PC active):', process.env.REACT_APP_CLOUDFLARE_API_URL);
-        return process.env.REACT_APP_CLOUDFLARE_API_URL;
-      }
-    }
-    
-    // Fallback to Render backend
+    // For production, use Render backend
     if (process.env.REACT_APP_RENDER_API_URL) {
       const renderAvailable = await testBackendAvailability(process.env.REACT_APP_RENDER_API_URL);
       if (renderAvailable) {
-        console.log('✅ Using Render backend (fallback):', process.env.REACT_APP_RENDER_API_URL);
+        console.log('✅ Using Render backend:', process.env.REACT_APP_RENDER_API_URL);
         return process.env.REACT_APP_RENDER_API_URL;
       }
     }
     
-    // Final fallback to Render.com URL
+    // Fallback to Render.com URL
     const productionUrl = 'https://ims-iwiz-solutions.onrender.com/api';
     console.log('✅ Using fallback production URL:', productionUrl);
     return productionUrl;
@@ -177,9 +159,6 @@ export const switchBackend = async (backendType) => {
     case 'render':
       newBaseURL = process.env.REACT_APP_RENDER_API_URL || 'https://ims-iwiz-solutions.onrender.com/api';
       break;
-    case 'cloudflare':
-      newBaseURL = process.env.REACT_APP_CLOUDFLARE_API_URL || '';
-      break;
     case 'local':
       newBaseURL = 'http://localhost:5000/api';
       break;
@@ -211,7 +190,6 @@ export const getCurrentBackend = async () => {
 const getBackendTypeFromURL = (url) => {
   if (url.includes('localhost')) return 'local';
   if (url.includes('render.com')) return 'render';
-  if (url.includes('trycloudflare.com') || url.includes('cloudflare')) return 'cloudflare';
   return 'unknown';
 };
 

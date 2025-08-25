@@ -34,10 +34,6 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
       'https://ims-iwiz-solutions-git-main.vercel.app',
       'https://iwiz-inventory.vercel.app',
       'https://iwiz-inventory-git-main.vercel.app',
-      // Cloudflare tunnel domains
-      /^https:\/\/.*\.trycloudflare\.com$/,
-      /^https:\/\/.*\.cf\.tunnel\.com$/,
-      /^https:\/\/.*\.cloudflareaccess\.com$/,
       // Add any vercel.app domain for flexibility
       /^https:\/\/.*\.vercel\.app$/,
       // Allow any localhost for development
