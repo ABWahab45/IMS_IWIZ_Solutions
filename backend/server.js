@@ -8,21 +8,14 @@ require('dotenv').config();
 // Import upload configurations
 const { uploadConfigs, handleMulterError } = require('./middleware/upload');
 
-// Debug environment variables
-console.log('Environment check:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Set' : 'Not Set');
-console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME);
-console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not Set');
-console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not Set');
+
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Note: Upload directories are no longer needed as we're using Cloudinary
+
 
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production' 
@@ -58,11 +51,8 @@ app.use(cors({
     });
     
     if (isAllowed) {
-      console.log('CORS allowed origin:', origin);
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -74,14 +64,12 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Note: Static file serving for uploads is no longer needed as we're using Cloudinary
+
 
 // Handle preflight requests
 app.options('*', cors());
 
-// Connect to MongoDB with timeout and retry
-console.log('Attempting to connect to MongoDB...');
-console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not Set');
+
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -99,19 +87,19 @@ db.on('error', (err) => {
 });
 
 db.on('connected', () => {
-  console.log('MongoDB connected successfully');
+  // MongoDB connected successfully
 });
 
 db.on('disconnected', () => {
-  console.log('MongoDB disconnected');
+  // MongoDB disconnected
 });
 
 db.once('open', () => {
-  console.log('MongoDB connection opened');
+  // MongoDB connection opened
 });
 
 if (NODE_ENV === 'development') {
-  mongoose.set('debug', true);
+  
 }
 
 // Lightweight health check for uptime monitoring
@@ -243,9 +231,6 @@ app.get('/api/config-test', (req, res) => {
 // Avatar upload test endpoint
 app.post('/api/test-avatar-upload', uploadConfigs.avatar, handleMulterError, (req, res) => {
   try {
-    console.log('Test avatar upload - Request received');
-    console.log('Files:', req.file);
-    console.log('Body:', req.body);
     
     if (req.file) {
       res.json({
@@ -298,9 +283,6 @@ const server = app.listen(PORT, () => {
   clearTimeout(startupTimeout);
   console.log(`Server running on port ${PORT}`);
   console.log('IWIZ Solutions Inventory Management System');
-  console.log('Environment:', process.env.NODE_ENV);
-  console.log('MongoDB URI set:', !!process.env.MONGODB_URI);
-  console.log('Cloudinary configured:', !!process.env.CLOUDINARY_CLOUD_NAME);
 });
 
 // Add error handling for server
@@ -325,12 +307,5 @@ process.on('SIGINT', () => {
   server.close(() => {
     console.log('Process terminated');
     process.exit(0);
-  });
-});
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
   });
 });

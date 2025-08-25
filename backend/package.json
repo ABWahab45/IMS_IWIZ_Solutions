@@ -10,8 +10,7 @@
     "setup:local": "cp env.config .env && echo 'NODE_ENV=development' >> .env",
     "setup:production": "cp env.config .env && echo 'NODE_ENV=production' >> .env",
     "validate": "node -e \"require('dotenv').config(); console.log('Environment variables loaded successfully')\"",
-    "test:connection": "node -e \"require('dotenv').config(); const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI).then(() => { console.log('Database connection successful'); process.exit(0); }).catch(err => { console.error('Database connection failed:', err.message); process.exit(1); })\"",
-    "fix-counter": "node fix-product-counter.js"
+    "test:connection": "node -e \"require('dotenv').config(); const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI).then(() => { console.log('Database connection successful'); process.exit(0); }).catch(err => { console.error('Database connection failed:', err.message); process.exit(1); })\""
   },
   "dependencies": {
     "axios": "^1.11.0",

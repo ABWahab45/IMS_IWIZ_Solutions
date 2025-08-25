@@ -35,7 +35,7 @@ const Profile = () => {
   };
 
   const handleAvatarChange = (e) => {
-    console.log('Avatar file selected:', e.target.files[0]);
+
     setAvatar(e.target.files[0]);
   };
 
@@ -50,7 +50,7 @@ const Profile = () => {
       formData.append('phone', profileData.phone);
       
       if (avatar) {
-        console.log('Adding avatar to formData:', avatar);
+  
         formData.append('avatar', avatar);
       }
       

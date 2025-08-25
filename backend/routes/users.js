@@ -128,9 +128,7 @@ router.post('/', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterErr
 
     let avatarUrl = '';
     if (req.file) {
-      console.log('Create User - Uploaded file:', req.file);
-      console.log('Create User - File path:', req.file.path);
-      console.log('Create User - File filename:', req.file.filename);
+      
       avatarUrl = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
@@ -217,7 +215,7 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
     
     // If role is being changed, update permissions to match the new role
     if (role && role !== user.role) {
-      console.log(`Updating user ${user.email} role from ${user.role} to ${role}`);
+  
       user.role = role;
       
       // Update permissions based on the new role
@@ -234,15 +232,13 @@ router.put('/:id', auth, checkRole('admin'), uploadConfigs.avatar, handleMulterE
         canReturnHandover: role === 'employee',
       };
       
-      console.log(`Updated permissions for ${user.email}:`, user.permissions);
+  
     } else if (role) {
       user.role = role;
     }
 
     if (req.file) {
-      console.log('Update User - Uploaded file:', req.file);
-      console.log('Update User - File path:', req.file.path);
-      console.log('Update User - File filename:', req.file.filename);
+      
       user.avatar = req.file.path; // Cloudinary returns the full URL in file.path
     }
 

@@ -76,12 +76,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('AuthContext: Attempting login with email:', email);
-      console.log('AuthContext: API base URL:', api.defaults.baseURL);
+      
       
       const response = await api.post('/auth/login', { email, password });
       
-      console.log('AuthContext: Login response received:', response.data);
+      
       
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
@@ -111,14 +110,11 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (formData) => {
     try {
-      console.log('AuthContext: Sending profile update request');
+
       const response = await api.put('/auth/profile', formData, {
         headers: { 'Content-Type': undefined }
       });
-      console.log('AuthContext: Profile update response:', response.data);
-      
-      if (response.data.success) {
-        console.log('AuthContext: Updating user state with:', response.data.user);
+              if (response.data.success) {
         dispatch({
           type: 'UPDATE_USER',
           payload: response.data.user

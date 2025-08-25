@@ -67,9 +67,7 @@ router.post('/register', registerLimiter, uploadConfigs.avatar, handleMulterErro
 
     let avatarUrl = '';
     if (req.file) {
-      console.log('Registration - Uploaded file:', req.file);
-      console.log('Registration - File path:', req.file.path);
-      console.log('Registration - File filename:', req.file.filename);
+      
       avatarUrl = req.file.path; // Cloudinary returns the full URL in file.path
     }
 
@@ -137,15 +135,11 @@ router.post('/login', loginWithFailsafeBypass, [
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
   try {
-    console.log('Login attempt received:', {
-      email: req.body.email,
-      origin: req.headers.origin,
-      userAgent: req.headers['user-agent']
-    });
+
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
+
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -158,35 +152,35 @@ router.post('/login', loginWithFailsafeBypass, [
       email.toLowerCase().trim()
     ];
 
-    console.log('Trying email variations:', emailVariations);
+
 
     let user = null;
     for (const variation of emailVariations) {
       user = await User.findOne({ email: variation });
       if (user) {
-        console.log('User found with email variation:', variation);
+
         break;
       }
     }
 
     if (!user) {
-      console.log('No user found with any email variation');
+
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     if (!user.isActive) {
-      console.log('User account is deactivated');
+
       return res.status(401).json({ message: 'Account is deactivated' });
     }
 
-    console.log('Comparing password for user:', user.email);
+
     const isMatch = user.comparePassword(password);
     if (!isMatch) {
-      console.log('Password comparison failed');
+
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     
-    console.log('Password comparison successful');
+
 
     user.lastLogin = new Date();
     await user.save();
@@ -197,7 +191,7 @@ router.post('/login', loginWithFailsafeBypass, [
       { expiresIn: process.env.JWT_EXPIRE }
     );
 
-    console.log('Login successful for user:', user.email);
+
 
     res.json({
       success: true,
@@ -265,9 +259,7 @@ router.put('/profile', auth, uploadConfigs.avatar, handleMulterError, [
     if (phone) user.phone = phone;
 
     if (req.file) {
-      console.log('Profile Update - Uploaded file:', req.file);
-      console.log('Profile Update - File path:', req.file.path);
-      console.log('Profile Update - File filename:', req.file.filename);
+      
       user.avatar = req.file.path; // Cloudinary returns the full URL in file.path
     }
 

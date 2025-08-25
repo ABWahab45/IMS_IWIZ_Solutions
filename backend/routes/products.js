@@ -8,8 +8,7 @@ const { body, validationResult } = require('express-validator');
 const { validateProduct } = require('../middleware/validation');
 const { uploadLimiter } = require('../middleware/rateLimit');
 
-// Remove the duplicate validateProduct declaration (lines 11-16)
-// The validateProduct is already imported from middleware/validation.js
+
 
 // GET /api/products - Get all products with search and pagination
 router.get('/', async (req, res) => {
@@ -53,9 +52,7 @@ router.get('/', async (req, res) => {
     
     const total = await Product.countDocuments(query);
     
-    // Add debugging
-    console.log('Products found:', products.length);
-    console.log('First product sample:', products[0]);
+
     
     res.json({
       products,
@@ -78,7 +75,7 @@ router.get('/all', async (req, res) => {
       .select('name productId stock price status')
       .sort({ name: 1 });
     
-    console.log('All products for dropdowns:', products.length);
+
     
     res.json({
       products,
@@ -157,10 +154,7 @@ router.post('/', auth, checkPermission('canAddProducts'), uploadLimiter, uploadC
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
-      console.log('Uploaded files:', req.files);
-      console.log('First file object:', req.files[0]);
-      console.log('File path:', req.files[0].path);
-      console.log('File filename:', req.files[0].filename);
+      
       
       productData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
@@ -168,7 +162,7 @@ router.post('/', auth, checkPermission('canAddProducts'), uploadLimiter, uploadC
         isPrimary: index === 0
       }));
       
-      console.log('Processed images:', productData.images);
+
     }
 
     const product = new Product(productData);
@@ -247,9 +241,7 @@ router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.produ
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
-      console.log('Update - Uploaded files:', req.files);
-      console.log('Update - First file object:', req.files[0]);
-      console.log('Update - File path:', req.files[0].path);
+
       
       updateData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
@@ -257,7 +249,7 @@ router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.produ
         isPrimary: index === 0
       }));
       
-      console.log('Update - Processed images:', updateData.images);
+
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(

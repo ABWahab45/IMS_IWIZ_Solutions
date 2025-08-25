@@ -25,7 +25,7 @@ const prodLimiter = rateLimit({
 // General API rate limiter - choose based on environment
 const apiLimiter = process.env.NODE_ENV === 'production' ? prodLimiter : devLimiter;
 
-// Auth endpoints rate limiter (more lenient for debugging)
+// Auth endpoints rate limiter
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: process.env.NODE_ENV === 'production' ? 100 : 200, // Increased limit

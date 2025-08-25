@@ -1,14 +1,6 @@
 import axios from 'axios';
 
-// Function to check if server PC is likely online (9 AM to 6 PM)
-const isServerPCAvailable = () => {
-  const now = new Date();
-  const hour = now.getHours();
-  const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; // Monday to Friday
-  
-  // Server PC available: 9 AM to 6 PM on weekdays
-  return isWeekday && hour >= 9 && hour < 18;
-};
+
 
 // Function to test backend availability
 const testBackendAvailability = async (url) => {
@@ -16,22 +8,14 @@ const testBackendAvailability = async (url) => {
     const response = await axios.get(`${url}/health`, { timeout: 5000 });
     return response.status === 200;
   } catch (error) {
-    console.log(`❌ Backend ${url} is not available:`, error.message);
     return false;
   }
 };
 
 const getBaseURL = async () => {
-  console.log('🔍 API Configuration Debug:');
-  console.log('REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-  console.log('REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
-  console.log('REACT_APP_BACKEND_MODE:', process.env.REACT_APP_BACKEND_MODE);
-  console.log('window.location.hostname:', window.location.hostname);
-  console.log('window.location.origin:', window.location.origin);
   
   // Check for explicit API URL in environment variables
   if (process.env.REACT_APP_API_URL) {
-    console.log('✅ Using REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
     return process.env.REACT_APP_API_URL;
   }
   
@@ -40,7 +24,6 @@ const getBaseURL = async () => {
     const mode = process.env.REACT_APP_BACKEND_MODE.toLowerCase();
     
     if (mode === 'render' && process.env.REACT_APP_RENDER_API_URL) {
-      console.log('✅ Using Render backend:', process.env.REACT_APP_RENDER_API_URL);
       return process.env.REACT_APP_RENDER_API_URL;
     }
   }
@@ -51,20 +34,17 @@ const getBaseURL = async () => {
     if (process.env.REACT_APP_RENDER_API_URL) {
       const renderAvailable = await testBackendAvailability(process.env.REACT_APP_RENDER_API_URL);
       if (renderAvailable) {
-        console.log('✅ Using Render backend:', process.env.REACT_APP_RENDER_API_URL);
         return process.env.REACT_APP_RENDER_API_URL;
       }
     }
     
     // Fallback to Render.com URL
     const productionUrl = 'https://ims-iwiz-solutions.onrender.com/api';
-    console.log('✅ Using fallback production URL:', productionUrl);
     return productionUrl;
   }
   
   // Local development - force localhost:5000
   const localUrl = 'http://localhost:5000/api';
-  console.log('✅ Using local development URL:', localUrl);
   return localUrl;
 };
 
@@ -94,7 +74,6 @@ const initializeApi = async () => {
           delete config.headers['Content-Type'];
         }
         
-        console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
         return config;
       },
       (error) => {
@@ -112,11 +91,9 @@ const initializeApi = async () => {
         
         // If current backend fails, try switching to another
         if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
-          console.log('🔄 Backend failed, attempting to switch...');
           const newBaseURL = await getBaseURL();
           if (newBaseURL !== api.defaults.baseURL) {
             api.defaults.baseURL = newBaseURL;
-            console.log('✅ Switched to backup backend:', newBaseURL);
             // Retry the request
             return api.request(error.config);
           }
@@ -140,13 +117,10 @@ const getApi = async () => {
 
 export const testApiConnection = async () => {
   try {
-    console.log('🧪 Testing API connection...');
     const apiInstance = await getApi();
     const response = await apiInstance.get('/health');
-    console.log('✅ API connection test successful:', response.data);
     return response.data;
   } catch (error) {
-    console.error('❌ API Connection Test Failed:', error);
     throw error;
   }
 };
@@ -171,7 +145,7 @@ export const switchBackend = async (backendType) => {
     if (api) {
       api.defaults.baseURL = newBaseURL;
     }
-    console.log(`🔄 Switched to ${backendType} backend:`, newBaseURL);
+
     return true;
   }
   

@@ -57,8 +57,7 @@ const InventoryList = () => {
       });
 
       const response = await api.get(`/products?${params.toString()}`);
-      console.log('Products response:', response.data);
-      console.log('First product status:', response.data.products?.[0]?.status);
+
       setProducts(response.data.products || []);
       setPagination({
         total: response.data.pagination?.total || response.data.total || 0,
