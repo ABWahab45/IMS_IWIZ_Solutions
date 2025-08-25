@@ -96,3 +96,17 @@
 2025-08-21T15:14:16: MongoDB URI: Set
 2025-08-21T15:14:18: MongoDB connected successfully
 2025-08-21T15:14:18: MongoDB connection opened
+2025-08-21T15:14:47: Cloudinary config - Cloud Name: dermm8zsk
+2025-08-21T15:14:47: Cloudinary config - API Key: Set
+2025-08-21T15:14:47: Cloudinary config - API Secret: Set
+2025-08-21T15:14:47: Environment check:
+2025-08-21T15:14:47: NODE_ENV: production
+2025-08-21T15:14:47: PORT: 5000
+2025-08-21T15:14:47: MONGODB_URI: Set
+2025-08-21T15:14:47: CLOUDINARY_CLOUD_NAME: dermm8zsk
+2025-08-21T15:14:47: CLOUDINARY_API_KEY: Set
+2025-08-21T15:14:47: CLOUDINARY_API_SECRET: Set
+2025-08-21T15:14:47: Attempting to connect to MongoDB...
+2025-08-21T15:14:47: MongoDB URI: Set
+2025-08-21T15:14:49: MongoDB connected successfully
+2025-08-21T15:14:49: MongoDB connection opened
