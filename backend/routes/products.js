@@ -294,34 +294,50 @@ router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.produ
 // DELETE /api/products/:id - Delete product
 router.delete('/:id', auth, checkPermission('canDeleteProducts'), async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Save the product ID for recycling before deleting
-    if (product.productId) {
-      const DeletedId = mongoose.model('DeletedId');
-      await DeletedId.create({ productId: product.productId });
-      console.log(`♻️ Saved product ID ${product.productId} for recycling`);
-    }
+    // Reset product counter and reorder IDs
+    await resetProductCounter();
 
-    // Delete the product
-    await Product.findByIdAndDelete(req.params.id);
-    
     res.json({ 
       message: 'Product deleted successfully',
-      deletedProduct: { 
-        id: product._id, 
-        name: product.name,
-        productId: product.productId 
-      }
+      deletedProduct: { id: product._id, name: product.name }
     });
   } catch (error) {
     console.error('Delete product error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+// Function to reset product counter and reorder IDs
+async function resetProductCounter() {
+  try {
+    // Get all products sorted by creation date
+    const products = await Product.find().sort({ createdAt: 1 });
+    
+    // Update each product with a new sequential ID
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      const newId = i + 1;
+      
+      if (product.productId !== newId) {
+        await Product.findByIdAndUpdate(product._id, { productId: newId });
+      }
+    }
+
+    // Reset the counter to the number of products
+    const Counter = mongoose.model('Counter');
+    await Counter.findByIdAndUpdate('productId', { seq: products.length }, { upsert: true });
+
+    console.log(`✅ Product counter reset. Total products: ${products.length}`);
+  } catch (error) {
+    console.error('❌ Error resetting product counter:', error);
+    throw error;
+  }
+}
 
 // PUT /api/products/:id/stock - Update stock
 router.put('/:id/stock', auth, checkPermission('canManageProducts'), async (req, res) => {

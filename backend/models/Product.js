@@ -7,14 +7,6 @@ const counterSchema = new mongoose.Schema({
 
 const Counter = mongoose.model('Counter', counterSchema);
 
-// Schema to track deleted product IDs for recycling
-const deletedIdSchema = new mongoose.Schema({
-  productId: { type: Number, required: true, unique: true },
-  deletedAt: { type: Date, default: Date.now }
-});
-
-const DeletedId = mongoose.model('DeletedId', deletedIdSchema);
-
 const productSchema = new mongoose.Schema({
   productId: {
     type: Number,
@@ -106,29 +98,16 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Auto-increment function with ID recycling
+// Auto-increment function
 productSchema.pre('save', async function(next) {
   if (this.isNew && !this.productId) {
     try {
-      // First, try to get the lowest available deleted ID
-      const deletedId = await DeletedId.findOne().sort({ productId: 1 });
-      
-      if (deletedId) {
-        // Use the recycled ID
-        this.productId = deletedId.productId;
-        // Remove the ID from deleted IDs collection
-        await DeletedId.findByIdAndDelete(deletedId._id);
-        console.log(`♻️ Recycled product ID: ${this.productId}`);
-      } else {
-        // No recycled IDs available, increment counter
-        const counter = await Counter.findByIdAndUpdate(
-          'productId',
-          { $inc: { seq: 1 } },
-          { new: true, upsert: true }
-        );
-        this.productId = counter.seq;
-        console.log(`🆕 Generated new product ID: ${this.productId}`);
-      }
+      const counter = await Counter.findByIdAndUpdate(
+        'productId',
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      this.productId = counter.seq;
     } catch (error) {
       console.error('Error generating product ID:', error);
       // If counter fails, use timestamp as fallback
