@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const { auth, checkPermission, managerAndAbove } = require('../middleware/auth');
 const { uploadConfigs, handleMulterError } = require('../middleware/upload');
@@ -293,13 +294,28 @@ router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.produ
 // DELETE /api/products/:id - Delete product
 router.delete('/:id', auth, checkPermission('canDeleteProducts'), async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Save the product ID for recycling before deleting
+    if (product.productId) {
+      const DeletedId = mongoose.model('DeletedId');
+      await DeletedId.create({ productId: product.productId });
+      console.log(`♻️ Saved product ID ${product.productId} for recycling`);
+    }
+
+    // Delete the product
+    await Product.findByIdAndDelete(req.params.id);
+    
     res.json({ 
       message: 'Product deleted successfully',
-      deletedProduct: { id: product._id, name: product.name }
+      deletedProduct: { 
+        id: product._id, 
+        name: product.name,
+        productId: product.productId 
+      }
     });
   } catch (error) {
     console.error('Delete product error:', error);
