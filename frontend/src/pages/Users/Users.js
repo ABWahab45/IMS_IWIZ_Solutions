@@ -109,17 +109,25 @@ const Users = () => {
         <div className="card-header">
           <div className="row align-items-center">
             <div className="col-md-6">
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-search"></i>
-                </span>
+              <div className="position-relative">
                 <input
                   type="text"
                   className="form-control"
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ paddingLeft: '40px' }}
                 />
+                <i 
+                  className="fas fa-search position-absolute" 
+                  style={{ 
+                    left: '12px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)', 
+                    color: '#6c757d',
+                    pointerEvents: 'none'
+                  }}
+                ></i>
               </div>
             </div>
             <div className="col-md-3">
@@ -135,7 +143,7 @@ const Users = () => {
               </select>
             </div>
             <div className="col-md-3 text-end">
-              <small className="text-muted">
+              <small style={{ color: 'var(--text-muted)' }}>
                 {users.length} users found
               </small>
             </div>
@@ -146,7 +154,7 @@ const Users = () => {
           {users.length === 0 ? (
             <div className="text-center py-5">
               <i className="fas fa-users fa-3x text-muted mb-3"></i>
-              <h5 className="text-muted">No users found</h5>
+              <h5 style={{ color: 'var(--text-muted)' }}>No users found</h5>
             </div>
           ) : (
             <div className="table-responsive">
@@ -180,7 +188,7 @@ const Users = () => {
                           <div>
                             <strong>{user.firstName} {user.lastName}</strong>
                             {user.phone && (
-                              <div className="small text-muted">{user.phone}</div>
+                              <div className="small" style={{ color: 'var(--text-muted)' }}>{user.phone}</div>
                             )}
                           </div>
                         </div>
@@ -193,7 +201,7 @@ const Users = () => {
                         </span>
                       </td>
                       <td className="d-none d-lg-table-cell">
-                        <small className="text-muted">
+                        <small style={{ color: 'var(--text-muted)' }}>
                           {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-PK') : 'Never'}
                         </small>
                       </td>

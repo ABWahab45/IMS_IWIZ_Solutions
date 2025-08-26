@@ -90,9 +90,35 @@ const InventoryList = () => {
 
     const pages = [];
     const maxVisiblePages = 5;
-    const startPage = Math.max(1, pagination.current - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(pagination.pages, startPage + maxVisiblePages - 1);
+    
+    // Calculate the range of pages to show
+    let startPage = Math.max(1, pagination.current - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(pagination.pages, startPage + maxVisiblePages - 1);
+    
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
 
+    // Add ellipsis and first page if needed
+    if (startPage > 1) {
+      pages.push(
+        <li key="1" className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(1)}>
+            1
+          </button>
+        </li>
+      );
+      if (startPage > 2) {
+        pages.push(
+          <li key="ellipsis1" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>
+        );
+      }
+    }
+
+    // Add the main page range
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <li key={i} className={`page-item ${pagination.current === i ? 'active' : ''}`}>
@@ -103,9 +129,32 @@ const InventoryList = () => {
       );
     }
 
+    // Add ellipsis and last page if needed
+    if (endPage < pagination.pages) {
+      if (endPage < pagination.pages - 1) {
+        pages.push(
+          <li key="ellipsis2" className="page-item disabled">
+            <span className="page-link">...</span>
+          </li>
+        );
+      }
+      pages.push(
+        <li key={pagination.pages} className="page-item">
+          <button className="page-link" onClick={() => handlePageChange(pagination.pages)}>
+            {pagination.pages}
+          </button>
+        </li>
+      );
+    }
+
     return (
       <nav>
         <ul className="pagination justify-content-center">
+          <li className={`page-item ${pagination.current === 1 ? 'disabled' : ''}`}>
+            <button className="page-link" onClick={() => handlePageChange(1)}>
+              First
+            </button>
+          </li>
           <li className={`page-item ${pagination.current === 1 ? 'disabled' : ''}`}>
             <button className="page-link" onClick={() => handlePageChange(pagination.current - 1)}>
               Previous
@@ -115,6 +164,11 @@ const InventoryList = () => {
           <li className={`page-item ${pagination.current === pagination.pages ? 'disabled' : ''}`}>
             <button className="page-link" onClick={() => handlePageChange(pagination.current + 1)}>
               Next
+            </button>
+          </li>
+          <li className={`page-item ${pagination.current === pagination.pages ? 'disabled' : ''}`}>
+            <button className="page-link" onClick={() => handlePageChange(pagination.pages)}>
+              Last
             </button>
           </li>
         </ul>
@@ -128,7 +182,7 @@ const InventoryList = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 className="h3 mb-1">Inventory Management</h1>
-          <p className="text-muted mb-0">Manage your inventory items</p>
+          <p style={{ color: 'var(--text-muted)' }} className="mb-0">Manage your inventory items</p>
         </div>
         <div className="d-flex gap-2">
           {hasPermission('canAddProducts') && (
@@ -187,7 +241,7 @@ const InventoryList = () => {
         <div className="card-header d-flex justify-content-between align-items-center">
           <h5 className="card-title mb-0">Products List</h5>
           <div className="d-flex align-items-center gap-2">
-            <small className="text-muted">
+            <small style={{ color: 'var(--text-muted)' }}>
               Showing {products.length} of {pagination.total || 0} products
             </small>
             <select
@@ -208,8 +262,8 @@ const InventoryList = () => {
           ) : products.length === 0 ? (
             <div className="text-center py-5">
               <i className="fas fa-box fa-3x text-muted mb-3"></i>
-              <h5 className="text-muted">No products found</h5>
-              <p className="text-muted">Try adjusting your filters or add a new product.</p>
+              <h5 style={{ color: 'var(--text-muted)' }}>No products found</h5>
+              <p style={{ color: 'var(--text-muted)' }}>Try adjusting your filters or add a new product.</p>
               {hasPermission('canAddProducts') && (
                 <Link to="/inventory/new" className="btn btn-primary">
                   <i className="fas fa-plus me-2"></i>
@@ -251,7 +305,7 @@ const InventoryList = () => {
                             <div>
                               <div className="fw-medium">{product.name}</div>
                               {product.description && (
-                                <small className="text-muted">{product.description.substring(0, 50)}...</small>
+                                <small style={{ color: 'var(--text-muted)' }}>{product.description.substring(0, 50)}...</small>
                               )}
                             </div>
                           </div>
@@ -259,7 +313,7 @@ const InventoryList = () => {
                         <td>
                           <div>
                             <span className="fw-medium">{product.stock?.quantity || 0}</span>
-                            <small className="text-muted ms-1">{product.stock?.unit || 'pcs'}</small>
+                            <small style={{ color: 'var(--text-muted)' }} className="ms-1">{product.stock?.unit || 'pcs'}</small>
                           </div>
                           <span className={`badge ${stockStatus.class} badge-sm`}>
                             {stockStatus.text}
@@ -267,7 +321,7 @@ const InventoryList = () => {
                         </td>
                         <td className="d-none d-md-table-cell">
                           <div className="fw-medium">₨{(product.price?.selling || 0).toFixed(2)}</div>
-                          <small className="text-muted">Cost: ₨{(product.price?.cost || 0).toFixed(2)}</small>
+                          <small style={{ color: 'var(--text-muted)' }}>Cost: ₨{(product.price?.cost || 0).toFixed(2)}</small>
                         </td>
                         <td className="d-none d-sm-table-cell">
                           <span className={`badge ${

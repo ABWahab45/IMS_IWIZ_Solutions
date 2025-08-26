@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import SearchableDropdown from '../../components/Common/SearchableDropdown';
 
 const NewHandOver = () => {
   const [products, setProducts] = useState([]);
@@ -119,19 +120,21 @@ const NewHandOver = () => {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Product *</label>
-                    <select
-                      className="form-control"
+                    <SearchableDropdown
+                      options={products.filter(product => (product.stock?.quantity || 0) > 0).map(product => ({
+                        _id: product._id,
+                        name: `#${product.productId} - ${product.name} (Available: ${product.stock?.quantity || 0})`,
+                        productId: product.productId,
+                        originalName: product.name
+                      }))}
                       value={formData.productId}
-                      onChange={(e) => setFormData({...formData, productId: e.target.value})}
-                      required
-                    >
-                      <option value="">Select Product</option>
-                      {products.filter(product => (product.stock?.quantity || 0) > 0).map(product => (
-                        <option key={product._id} value={product._id}>
-                          #{product.productId} - {product.name} (Available: {product.stock?.quantity || 0})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => setFormData({...formData, productId: value})}
+                      placeholder="Search and select product..."
+                      displayKey="name"
+                      valueKey="_id"
+                      searchKeys={["name", "productId", "originalName"]}
+                      required={true}
+                    />
                   </div>
                   
                   <div className="col-md-6">

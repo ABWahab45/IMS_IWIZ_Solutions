@@ -167,17 +167,25 @@ const PendingHandovers = () => {
         <div className="card-body">
           <div className="row">
             <div className="col-md-6">
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-search"></i>
-                </span>
+              <div className="position-relative">
                 <input
                   type="text"
                   className="form-control"
                   placeholder="Search by employee, product, or reason..."
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                  style={{ paddingLeft: '40px' }}
                 />
+                <i 
+                  className="fas fa-search position-absolute"
+                  style={{
+                    left: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#6c757d',
+                    zIndex: 2
+                  }}
+                ></i>
               </div>
             </div>
             <div className="col-md-6">

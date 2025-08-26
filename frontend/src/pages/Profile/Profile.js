@@ -123,8 +123,8 @@ const Profile = () => {
                   showPlaceholder={true}
                 />
               </div>
-              <h5>{user?.firstName} {user?.lastName}</h5>
-              <p className="text-muted">{user?.email}</p>
+              <h5 style={{ color: 'var(--text-primary)' }}>{user?.firstName} {user?.lastName}</h5>
+              <p style={{ color: 'var(--text-muted)' }}>{user?.email}</p>
               <span className={`badge bg-${user?.role === 'admin' ? 'danger' : user?.role === 'manager' ? 'warning' : 'info'}`}>
                 {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
               </span>
@@ -203,7 +203,7 @@ const Profile = () => {
                       value={user?.email || ''}
                       disabled
                     />
-                    <small className="form-text text-muted">Email cannot be changed</small>
+                    <small className="form-text" style={{ color: 'var(--text-muted)' }}>Email cannot be changed</small>
                   </div>
                   
                   <div className="form-group mb-3">
@@ -228,7 +228,7 @@ const Profile = () => {
                       value={user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || ''}
                       disabled
                     />
-                    <small className="form-text text-muted">Role cannot be changed</small>
+                    <small className="form-text" style={{ color: 'var(--text-muted)' }}>Role cannot be changed</small>
                   </div>
                   
                   <div className="form-group mb-4">
@@ -241,7 +241,7 @@ const Profile = () => {
                       accept="image/*"
                       onChange={handleAvatarChange}
                     />
-                    <small className="form-text text-muted">Choose a new profile picture (optional)</small>
+                    <small className="form-text" style={{ color: 'var(--text-muted)' }}>Choose a new profile picture (optional)</small>
                   </div>
                   
                   <button
@@ -289,7 +289,7 @@ const Profile = () => {
                       required
                       minLength={6}
                     />
-                    <small className="form-text text-muted">Password must be at least 6 characters long</small>
+                    <small className="form-text" style={{ color: 'var(--text-muted)' }}>Password must be at least 6 characters long</small>
                   </div>
                   
                   <div className="form-group mb-4">

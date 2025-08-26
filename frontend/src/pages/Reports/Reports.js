@@ -98,7 +98,7 @@ const Reports = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 className="h3 mb-1">Activity Reports</h1>
-          <p className="text-muted mb-0">View all system activities and events</p>
+          <p style={{ color: 'var(--text-muted)' }} className="mb-0">View all system activities and events</p>
         </div>
         <div className="d-flex gap-2">
           <button
@@ -144,9 +144,9 @@ const Reports = () => {
               </select>
             </div>
             <div className="col-md-6 d-flex align-items-end">
-              <div className="text-muted">
-                Showing {filteredActivities.length} of {activities.length} activities
-              </div>
+                          <div style={{ color: 'var(--text-muted)' }}>
+              Showing {filteredActivities.length} of {activities.length} activities
+            </div>
             </div>
           </div>
         </div>
@@ -164,8 +164,8 @@ const Reports = () => {
           {filteredActivities.length === 0 ? (
             <div className="text-center py-5">
               <i className="fas fa-search text-muted fa-3x mb-3"></i>
-              <p className="text-muted">No activities found</p>
-              <small className="text-muted">Try adjusting your filters or check back later</small>
+              <p style={{ color: 'var(--text-muted)' }}>No activities found</p>
+              <small style={{ color: 'var(--text-muted)' }}>Try adjusting your filters or check back later</small>
             </div>
           ) : (
                          <div className="reports-activity-list">
@@ -178,12 +178,12 @@ const Reports = () => {
                      <div className="d-flex justify-content-between align-items-start">
                        <div className="flex-grow-1 min-w-0 me-2">
                          <div className="fw-semibold text-dark text-truncate mb-1">{activity.title || 'Activity'}</div>
-                         <div className="text-muted small text-truncate mb-1">{activity.description || 'No description available'}</div>
-                         {activity.user && activity.user.firstName && activity.user.lastName && (
-                           <div className="text-muted small text-truncate mb-1">
-                             by {activity.user.firstName} {activity.user.lastName}
-                           </div>
-                         )}
+                         <div style={{ color: 'var(--text-muted)' }} className="small text-truncate mb-1">{activity.description || 'No description available'}</div>
+                                                    {activity.user && activity.user.firstName && activity.user.lastName && (
+                             <div style={{ color: 'var(--text-muted)' }} className="small text-truncate mb-1">
+                               by {activity.user.firstName} {activity.user.lastName}
+                             </div>
+                           )}
                          <div>
                            <span className={`badge bg-${getActivityColor(activity.type)} bg-opacity-10 text-${getActivityColor(activity.type)}`}>
                              {getActivityTypeLabel(activity.type)}
@@ -191,10 +191,10 @@ const Reports = () => {
                          </div>
                        </div>
                        <div className="text-end flex-shrink-0">
-                         <small className="text-muted d-block">
+                         <small style={{ color: 'var(--text-muted)' }} className="d-block">
                            {activity.date ? new Date(activity.date).toLocaleDateString('en-PK') : 'Unknown date'}
                          </small>
-                         <small className="text-muted d-block">
+                         <small style={{ color: 'var(--text-muted)' }} className="d-block">
                            {activity.date ? new Date(activity.date).toLocaleTimeString('en-PK', {hour: '2-digit', minute: '2-digit'}) : ''}
                          </small>
                        </div>
