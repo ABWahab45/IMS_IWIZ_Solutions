@@ -56,7 +56,7 @@ const initializeApi = async () => {
     const baseURL = await getBaseURL();
     api = axios.create({
       baseURL,
-      timeout: 15000,
+      timeout: 30000, // Increased from 15000 to 30000 (30 seconds)
       headers: {
         'Content-Type': 'application/json'
       }

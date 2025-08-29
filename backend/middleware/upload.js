@@ -61,7 +61,7 @@ const productUpload = multer({
 
 const uploadConfigs = {
   avatar: avatarUpload.single('avatar'),
-  productImages: productUpload.array('productImages', 5)
+  productImages: productUpload.array('productImages', 20)
 };
 
 const handleMulterError = (error, req, res, next) => {
@@ -70,7 +70,7 @@ const handleMulterError = (error, req, res, next) => {
       return res.status(400).json({ message: 'File too large. Maximum size is 10MB.' });
     }
     if (error.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({ message: 'Too many files. Maximum is 5 files.' });
+      return res.status(400).json({ message: 'Too many files. Maximum is 20 files.' });
     }
     if (error.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).json({ message: 'Unexpected file field.' });

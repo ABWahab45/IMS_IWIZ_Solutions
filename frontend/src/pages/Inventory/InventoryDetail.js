@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import ImageWithFallback from '../../components/Common/ImageWithFallback';
+import ImageGallery from '../../components/Common/ImageGallery';
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -154,23 +154,11 @@ const ProductDetail = () => {
                 </div>
                 
                 <div className="col-md-6">
-                  <div className="product-images">
-                    <ImageWithFallback
-                      src={product.images && product.images.length > 0 ? product.images[0] : null}
-                      alt={product.name}
-                      type="product"
-                      className="img-fluid rounded"
-                      style={{ maxHeight: '300px', width: '100%', objectFit: 'cover' }}
-                      placeholderText="No images available"
-                    />
-                    {product.images && product.images.length > 1 && (
-                      <div className="mt-2">
-                        <small className="text-muted">
-                          +{product.images.length - 1} more image(s)
-                        </small>
-                      </div>
-                    )}
-                  </div>
+                  <ImageGallery 
+                    images={product.images || []}
+                    type="product"
+                    maxThumbnails={4}
+                  />
                 </div>
               </div>
             </div>

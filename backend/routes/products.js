@@ -154,15 +154,24 @@ router.post('/', auth, checkPermission('canAddProducts'), uploadLimiter, uploadC
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
+      const primaryImageIndex = parseInt(req.body.primaryImageIndex) || 0;
       
+      // Validate primary image index
+      if (primaryImageIndex < 0 || primaryImageIndex >= req.files.length) {
+        return res.status(400).json({ 
+          message: 'Invalid primary image index' 
+        });
+      }
       
       productData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
-        alt: req.body.name,
-        isPrimary: index === 0
+        alt: `${req.body.name} image ${index + 1}`,
+        isPrimary: index === primaryImageIndex
       }));
-      
-
+    } else {
+      return res.status(400).json({ 
+        message: 'At least one product image is required' 
+      });
     }
 
     const product = new Product(productData);
@@ -241,15 +250,13 @@ router.put('/:id', auth, checkPermission('canEditProducts'), uploadConfigs.produ
 
     // Handle image upload
     if (req.files && req.files.length > 0) {
-
+      const primaryImageIndex = parseInt(req.body.primaryImageIndex);
       
       updateData.images = req.files.map((file, index) => ({
         url: file.path, // Cloudinary returns the full URL in file.path
-        alt: req.body.name,
-        isPrimary: index === 0
+        alt: `${req.body.name} image ${index + 1}`,
+        isPrimary: false // Don't set as primary for updates by default
       }));
-      
-
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(

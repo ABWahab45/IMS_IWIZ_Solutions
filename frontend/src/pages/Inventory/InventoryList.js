@@ -3,12 +3,39 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import ImageWithFallback from '../../components/Common/ImageWithFallback';
+import ImageGallery from '../../components/Common/ImageGallery';
 import { useAuth } from '../../contexts/AuthContext';
 
 const InventoryList = () => {
   const { user, hasPermission } = useAuth();
   const [products, setProducts] = useState([]);
+
+  // Add CSS for hover effects
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      }
+      .product-image-container {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+      }
+      .product-image-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+      }
+
+
+
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
   const [filters, setFilters] = useState({
@@ -294,15 +321,26 @@ const InventoryList = () => {
                         </td>
                         <td>
                           <div className="d-flex align-items-center">
-                            <ImageWithFallback
-                              src={product.images && product.images.length > 0 ? product.images[0] : null}
-                              alt={product.name}
-                              type="product"
-                              className="rounded me-3"
-                              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                              placeholderText="No image"
-                            />
-                            <div>
+                                            <div 
+                  className="product-image-container hover-lift"
+                  style={{ 
+                    width: '70px', 
+                    height: '70px', 
+                    flexShrink: 0
+                  }}
+                >
+                  <ImageGallery 
+                    images={product.images || []}
+                    type="product"
+                    maxThumbnails={1}
+                    className=""
+                    style={{ 
+                      width: '70px', 
+                      height: '70px'
+                    }}
+                  />
+                </div>
+                            <div className="ms-3">
                               <div className="fw-medium">{product.name}</div>
                               {product.description && (
                                 <small style={{ color: 'var(--text-muted)' }}>{product.description.substring(0, 50)}...</small>

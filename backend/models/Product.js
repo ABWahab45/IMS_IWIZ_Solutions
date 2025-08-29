@@ -73,11 +73,19 @@ const productSchema = new mongoose.Schema({
       default: Date.now
     }
   },
-  images: [{
-    url: String,
-    alt: String,
-    isPrimary: { type: Boolean, default: false }
-  }],
+  images: {
+    type: [{
+      url: String,
+      alt: String,
+      isPrimary: { type: Boolean, default: false }
+    }],
+    validate: {
+      validator: function(images) {
+        return images.length >= 1 && images.length <= 20;
+      },
+      message: 'Product must have between 1 and 20 images'
+    }
+  },
   tags: [String],
   status: {
     type: String,

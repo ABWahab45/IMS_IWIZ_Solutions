@@ -65,13 +65,22 @@ class ProductController {
 
       // Process uploaded images
       const images = [];
+      const primaryImageIndex = parseInt(req.body.primaryImageIndex) || 0;
+      
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
           images.push({
             url: file.path, // Cloudinary returns the full URL in file.path
             alt: `${name} image ${index + 1}`,
-            isPrimary: index === 0
+            isPrimary: index === primaryImageIndex
           });
+        });
+      }
+
+      // Validate that at least one image is provided
+      if (images.length === 0) {
+        return res.status(400).json({ 
+          message: 'At least one product image is required' 
         });
       }
 
@@ -129,15 +138,33 @@ class ProductController {
         status
       } = req.body;
 
+      // Get existing product to check current images
+      const existingProduct = await Product.findById(id);
+      if (!existingProduct) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+
       // Process uploaded images
-      const images = [];
+      const newImages = [];
+      const primaryImageIndex = parseInt(req.body.primaryImageIndex);
+      
       if (req.files && req.files.length > 0) {
         req.files.forEach((file, index) => {
-          images.push({
+          newImages.push({
             url: file.path, // Cloudinary returns the full URL in file.path
             alt: `${name} image ${index + 1}`,
-            isPrimary: index === 0
+            isPrimary: false // Don't set as primary for updates by default
           });
+        });
+      }
+
+      // Combine existing images with new ones
+      const allImages = [...(existingProduct.images || []), ...newImages];
+      
+      // Validate total image count
+      if (allImages.length > 20) {
+        return res.status(400).json({ 
+          message: 'Maximum 20 images allowed per product' 
         });
       }
 
@@ -160,8 +187,8 @@ class ProductController {
         updatedBy: req.user.id
       };
 
-      if (images.length > 0) {
-        updateData.images = images;
+      if (newImages.length > 0) {
+        updateData.images = allImages;
       }
 
       const product = await Product.findByIdAndUpdate(
